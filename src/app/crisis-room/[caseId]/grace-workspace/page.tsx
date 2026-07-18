@@ -22,7 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { getIncidentById, gracePeriodReasonKeys } from "@/lib/mockData";
+import { gracePeriodReasonKeys } from "@/lib/mockData";
 import { useTranslation, type TranslationKey } from "@/lib/LanguageContext";
 import { useAppState } from "@/lib/AppStateContext";
 import { cn } from "@/lib/utils";
@@ -43,8 +43,10 @@ export default function GraceWorkspacePage() {
   const params = useParams<{ caseId: string }>();
   const router = useRouter();
   const { t, language } = useTranslation();
-  const { gracePending, requestGracePeriod } = useAppState();
-  const incident = getIncidentById(decodeURIComponent(params.caseId));
+  // อ่านเคสจาก store — ปิดคดีแล้วหน้านี้จะขึ้น "ไม่พบเคส" เองอัตโนมัติ
+  const { incident: activeIncident, gracePending, requestGracePeriod } = useAppState();
+  const incident =
+    activeIncident?.caseId === decodeURIComponent(params.caseId) ? activeIncident : undefined;
 
   // Form state
   const [dpoName, setDpoName] = useState("Watcharapol Charoensuk");

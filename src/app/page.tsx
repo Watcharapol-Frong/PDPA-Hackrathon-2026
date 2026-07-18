@@ -14,7 +14,7 @@ import { useAppState } from "@/lib/AppStateContext";
 export default function DashboardPage() {
   const { language } = useTranslation();
   // อ่านจาก store กลาง — ทุกหน้าเห็นสถานะเดียวกัน
-  const { incident, policy, updatePolicy, exemptionQueue: queue, approveExemptions } = useAppState();
+  const { incident, policy, legalState, updatePolicy, exemptionQueue: queue, approveExemptions } = useAppState();
   const [pendingGuard, setPendingGuard] = useState<"dataMasking" | "trafficThrottling" | null>(null);
   const policyRef = useRef<HTMLDivElement>(null);
 
@@ -89,12 +89,15 @@ export default function DashboardPage() {
             </div>
           </section>
 
-          {/* Section 2 — Exemption Request Queue */}
-          <section className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4">
-            <div className="lg:col-span-12">
-              <ExemptionQueue queue={queue} onApprove={handleApprove} onReject={handleReject} />
-            </div>
-          </section>
+          {/* Section 2 — Exemption Assessment
+               ซ่อนทั้ง section เมื่อ legalState = "1a" (ระบบปกติสุด) */}
+          {legalState !== "1a" && (
+            <section className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4">
+              <div className="lg:col-span-12">
+                <ExemptionQueue queue={queue} onApprove={handleApprove} onReject={handleReject} />
+              </div>
+            </section>
+          )}
 
           {/* Section 3 — Main Split Layout (Action Layer) */}
           <section className="grid grid-cols-1 xl:grid-cols-12 gap-4 sm:gap-6">

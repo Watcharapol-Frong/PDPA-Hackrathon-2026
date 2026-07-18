@@ -76,7 +76,7 @@ export function AppStateProvider({
   const [incident, setIncident] = useState<IncidentData | null>(initialIncident);
   const [gracePending, setGracePending] = useState(initialIncident?.status === "grace_requested");
   const [policy, setPolicy] = useState<PolicyState>({
-    dataMasking: false,
+    dataMasking: true,
     trafficThrottling: false,
   });
   const [exemptionQueue, setExemptionQueue] = useState<ExemptionCase[]>(initialExemptions);

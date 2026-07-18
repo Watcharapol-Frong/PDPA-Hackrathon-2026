@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { getIncidentById } from "@/lib/mockData";
+import { useAppState } from "@/lib/AppStateContext";
 import { useTranslation } from "@/lib/LanguageContext";
 import { cn } from "@/lib/utils";
 import type * as React from "react";
@@ -31,7 +31,10 @@ export default function DocumentWorkspacePage() {
   const params = useParams<{ caseId: string }>();
   const router = useRouter();
   const { t, language } = useTranslation();
-  const incident = getIncidentById(decodeURIComponent(params.caseId));
+  // อ่านเคสจาก store — ยื่นรายงานแล้วเคสจะถูกปิดและทุกหน้าอัปเดตพร้อมกัน
+  const { incident: activeIncident, resolveIncident } = useAppState();
+  const incident =
+    activeIncident?.caseId === decodeURIComponent(params.caseId) ? activeIncident : undefined;
 
   // State for form inputs (DPO composition)
   const [dpoName, setDpoName] = useState("Watcharapol Charoensuk");
@@ -71,6 +74,14 @@ export default function DocumentWorkspacePage() {
       setIsSubmitting(false);
       setSubmitSuccess(true);
     }, 1500);
+  };
+
+  // ปิดคดีตอนผู้ใช้กดรับทราบ ไม่ใช่ตอนกดส่ง — ไม่งั้นเคสหายไปก่อนที่ dialog สำเร็จจะทันแสดง
+  const acknowledgeAndClose = () => {
+    const target = `/crisis-room`;
+    setSubmitSuccess(false);
+    resolveIncident();
+    router.push(target);
   };
 
   const handleDownload = () => {
@@ -279,28 +290,42 @@ export default function DocumentWorkspacePage() {
                   </div>
                 </div>
 
-                {/* Part 3: Scope of Impact */}
-                <div className="space-y-2">
-                  <h4 className="font-extrabold text-[11px] uppercase tracking-wider text-zinc-900 border-b border-zinc-200 pb-1">
-                    {language === "th" ? "3. ขอบเขตและหมวดหมู่ข้อมูลส่วนบุคคลที่รั่วไหล (Affected Categories & Scale)" : "3. Scope of Impact"}
-                  </h4>
-                  <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-[11px]">
-                    <div>
-                      <span className="text-zinc-500">{language === "th" ? "ประเภทข้อมูลที่รั่วไหล (PII Categories):" : "Compromised Data Subjects:"}</span>
-                      <div className="flex flex-wrap gap-1 mt-1">
-                        {incident.compromisedFields.map((f) => (
-                          <span key={f.id} className="border border-zinc-400 bg-zinc-50 px-1 py-0.5 text-[9px] font-bold text-zinc-800 rounded-sm">
-                            {t(f.labelKey)}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                    <div>
-                      <span className="text-zinc-500">{language === "th" ? "จำนวนเจ้าของข้อมูลที่ประเมินขั้นแรก:" : "Estimated Impact Volume:"}</span>
-                      <p className="font-bold text-zinc-950 mt-0.5 text-base">{affectedCount} <span className="text-[10px] text-zinc-500 font-normal">{language === "th" ? "รายชื่อลูกค้า" : "data subject records"}</span></p>
-                    </div>
-                  </div>
-                </div>
+                 {/* Part 3: Scope of Impact */}
+                 <div className="space-y-3">
+                   <h4 className="font-extrabold text-[11px] uppercase tracking-wider text-zinc-900 border-b border-zinc-200 pb-1">
+                     {language === "th" ? "3. ขอบเขตและหมวดหมู่ข้อมูลส่วนบุคคลที่ได้รับผลกระทบ (Scope of Impact & Granular Details)" : "3. Scope of Impact & Affected Categories"}
+                   </h4>
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-[11px]">
+                     <div className="space-y-2">
+                       <span className="text-zinc-500 block mb-1">{language === "th" ? "แจกแจงประเภทข้อมูลที่รั่วไหลและจำนวนผลกระทบ:" : "Compromised PII Categories & Scale Details:"}</span>
+                       <div className="space-y-1.5 bg-zinc-50 p-2.5 border rounded-sm">
+                         {incident.compromisedFields.map((f) => (
+                           <div key={f.id} className="flex justify-between items-center text-[10px] py-0.5 border-b border-zinc-200/50 last:border-0 font-sans">
+                             <div className="flex items-center gap-1.5">
+                               <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
+                               <span className="font-bold text-zinc-800">{t(f.labelKey)}</span>
+                               <span className="text-[8px] font-mono text-zinc-400">({f.column})</span>
+                             </div>
+                             <span className="font-mono font-bold text-zinc-950">
+                               {f.affectedRows.toLocaleString(locale)} {language === "th" ? "รายการ" : "records"}
+                             </span>
+                           </div>
+                         ))}
+                       </div>
+                     </div>
+                     <div className="flex flex-col justify-between">
+                       <div>
+                         <span className="text-zinc-500">{language === "th" ? "จำนวนเจ้าของข้อมูลรวมที่ได้รับผลกระทบ:" : "Total Unique Data Subjects Affected:"}</span>
+                         <p className="font-bold text-zinc-950 mt-1 text-2xl tracking-tight">{affectedCount} <span className="text-[10px] text-zinc-500 font-normal">{language === "th" ? "รายชื่อลูกค้า" : "unique records"}</span></p>
+                       </div>
+                       <p className="text-[9px] leading-relaxed text-zinc-400 mt-2">
+                         {language === "th"
+                           ? "* อ้างอิงตามค่าสถิติจริงจาก WORM logs ณ เวลาที่เกิดอุบัติการณ์เพื่อรายงานต่อ สคส."
+                           : "* Values verified from immutable WORM telemetry metrics at incident timestamp for regulatory submission."}
+                       </p>
+                     </div>
+                   </div>
+                 </div>
 
                 {/* Part 4: Mitigation and Containment */}
                 <div className="space-y-2">
@@ -341,7 +366,7 @@ export default function DocumentWorkspacePage() {
         </div>
 
         {/* Action Success Overlay Dialog */}
-        <Dialog open={submitSuccess} onOpenChange={setSubmitSuccess}>
+        <Dialog open={submitSuccess} onOpenChange={(open) => !open && acknowledgeAndClose()}>
           <DialogContent className="border-t-4 border-t-green-600 sm:max-w-md">
             <div className="flex flex-col items-center justify-center text-center py-4 gap-3">
               <CheckCircle2 className="size-12 text-green-600 animate-bounce" />
@@ -357,10 +382,7 @@ export default function DocumentWorkspacePage() {
                 Ticket ID: PDPC-ACK-REG-9812-2026
               </div>
               <Button
-                onClick={() => {
-                  setSubmitSuccess(false);
-                  router.push(`/crisis-room/${encodeURIComponent(incident.caseId)}`);
-                }}
+                onClick={acknowledgeAndClose}
                 className="w-full mt-2 font-bold h-9 text-xs"
               >
                 {language === "th" ? "กลับไปหน้าห้องจัดการวิกฤต" : "Back to Crisis Room"}

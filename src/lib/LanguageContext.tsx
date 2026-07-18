@@ -92,7 +92,7 @@ const translations = {
     enableGuardBtn: "Enable recommended guard",
 
     // ExemptionQueue
-    queueTitle: "Exemption Assessment & Form 5 Log",
+    queueTitle: "Exemption Assessment",
     queueSub: "Risk assessment queue under PDPA rules for data breach notification exemptions",
     bulkApprove: "Record Exemption (Bulk)",
     selectedItems: "Selected {count} cases",
@@ -112,8 +112,8 @@ const translations = {
     scoreBreakdown: "Breach Risk Evaluation Factors",
     evaluationResult: "Legal Assessment",
     evaluationValue: "Exempted (Form 5) — Safe mitigation confirmed",
-    approveSingleBtn: "Approve Exemption & Record Form 5",
-    rejectSingleBtn: "Reject Exemption & Escalate Breach",
+    approveSingleBtn: "Approve Exemption",
+    rejectSingleBtn: "Reject & Escalate",
     deepAnalyseLink: "Perform Forensic Investigation",
 
     // Bulk Approve Modal
@@ -274,7 +274,7 @@ const translations = {
 
     // status labels
     statusAwaitingReview: "Awaiting DPO review",
-    statusInProgress: "In progress",
+    statusInProgress: "DPO Reviewing — Internal Investigation",
     statusGraceRequested: "Grace period requested",
 
     // incident titles
@@ -337,6 +337,29 @@ const translations = {
     evidenceCatPolicy: "Policy",
     evidenceCatReport: "Report",
     evidenceNoRationale: "—",
+
+    /* ── Threat Analytics Panel ── */
+    threatPageTitle: "Threat Analytics Panel",
+    threatPageSub: "Pipeline B (Probabilistic) — Isolation Forest campaign clustering over pseudonymised metadata",
+    threatActiveCampaign: "Linked national campaign",
+    threatCampaignId: "Campaign ID",
+    threatCampaignName: "Distributed Botnet — cross-tenant credential probing",
+    threatMatchConfidence: "Match confidence",
+    threatPeerOrgs: "Peer organisations affected",
+    threatPeerOrgsValue: "6 organisations (sector-anonymised)",
+    threatFirstSeen: "First seen nationally",
+    threatTelemetryTitle: "Risk telemetry — last 24 hours",
+    threatTelemetrySub: "Deterministic score from Pipeline A, plotted against detection time",
+    threatIoaTitle: "Indicators of attack (IoA)",
+    threatIoaSub: "Behavioural fingerprints shared across tenants — no raw PII, hashed identifiers only",
+    threatIoaEndpoint: "Repeated hits on a single export endpoint",
+    threatIoaVelocity: "Request velocity 312/min — far above tenant baseline",
+    threatIoaPayload: "Identical payload signature seen at other tenants",
+    threatIoaHours: "Activity concentrated outside business hours",
+    threatNoIncident: "No active campaign linked to your organisation",
+    threatNoIncidentSub: "Pipeline B continues monitoring anonymised metadata for cross-tenant patterns.",
+    threatViewIncident: "Open linked incident",
+    threatPrivacyNote: "Cross-tenant analysis runs on HMAC-SHA256 pseudonymised identifiers. Peer organisations are shown as industry sectors only.",
     auditActorDpo: "DPO (Nattakarn)",
     auditActionGraceRequested: "Emergency Grace Period Requested",
     auditActionMaskingOn: "Data Masking Enabled",
@@ -426,7 +449,7 @@ const translations = {
     enableGuardBtn: "กดเปิดเกราะแนะนำทันที",
 
     // ExemptionQueue
-    queueTitle: "การประเมินเหตุละเมิดและบันทึกข้อยกเว้น (Form 5)",
+    queueTitle: "การประเมินข้อยกเว้น",
     queueSub: "คิวประเมินความเสี่ยงเพื่อพิจารณาข้อยกเว้นการแจ้งเหตุละเมิดตามประกาศ สคส. ข้อ 9 วรรคสอง",
     bulkApprove: "บันทึกข้อยกเว้นแบบกลุ่ม",
     selectedItems: "เลือกอยู่ {count} เคส",
@@ -446,8 +469,8 @@ const translations = {
     scoreBreakdown: "ปัจจัยประเมินความเสี่ยงทางกฎหมาย",
     evaluationResult: "ผลวินิจฉัยทางกฎหมาย",
     evaluationValue: "เข้าเงื่อนไขข้อยกเว้น (ยื่น Form 5) — มีมาตรการคุ้มครองที่เหมาะสม",
-    approveSingleBtn: "อนุมัติข้อยกเว้นและบันทึก Form 5",
-    rejectSingleBtn: "ปฏิเสธข้อยกเว้น & รายงาน สคส. ด่วน",
+    approveSingleBtn: "อนุมัติข้อยกเว้น",
+    rejectSingleBtn: "ปฏิเสธ & แจ้ง สคส.",
     deepAnalyseLink: "ดำเนินการตรวจสอบนิติวิทยาศาสตร์ดิจิทัล",
 
     // Bulk Approve Modal
@@ -608,7 +631,7 @@ const translations = {
 
     // ป้ายความคืบหน้า
     statusAwaitingReview: "รอ DPO ตรวจสอบ",
-    statusInProgress: "กำลังดำเนินการ",
+    statusInProgress: "DPO รับทราบ — กำลังตรวจสอบภายใน",
     statusGraceRequested: "ขอขยายเวลาแล้ว",
 
     // ชื่อเหตุการณ์
@@ -671,6 +694,29 @@ const translations = {
     evidenceCatPolicy: "นโยบาย",
     evidenceCatReport: "รายงาน",
     evidenceNoRationale: "—",
+
+    /* ── แผงวิเคราะห์ภัยคุกคาม ── */
+    threatPageTitle: "วิเคราะห์ภาพรวมภัยคุกคาม",
+    threatPageSub: "Pipeline B (Probabilistic) — Isolation Forest จัดกลุ่มแคมเปญจาก Metadata ที่ปิดบังตัวตนแล้ว",
+    threatActiveCampaign: "แคมเปญระดับชาติที่เชื่อมโยง",
+    threatCampaignId: "รหัสแคมเปญ",
+    threatCampaignName: "Distributed Botnet — สุ่มเจาะข้อมูลยืนยันตัวตนข้ามองค์กร",
+    threatMatchConfidence: "ความเชื่อมั่นในการจับคู่",
+    threatPeerOrgs: "องค์กรอื่นที่ได้รับผลกระทบ",
+    threatPeerOrgsValue: "6 องค์กร (ระบุเป็นกลุ่มอุตสาหกรรมเท่านั้น)",
+    threatFirstSeen: "พบครั้งแรกในระดับประเทศ",
+    threatTelemetryTitle: "แนวโน้มความเสี่ยง 24 ชั่วโมงล่าสุด",
+    threatTelemetrySub: "คะแนนจาก Pipeline A เทียบกับเวลาที่ตรวจพบ",
+    threatIoaTitle: "ร่องรอยพฤติกรรมการโจมตี (IoA)",
+    threatIoaSub: "ลายนิ้วมือพฤติกรรมที่พบร่วมกันข้ามองค์กร — ไม่มี PII ดิบ ใช้ค่าที่แฮชแล้วเท่านั้น",
+    threatIoaEndpoint: "เรียก endpoint ส่งออกข้อมูลเดิมซ้ำผิดปกติ",
+    threatIoaVelocity: "ความเร็วคำขอ 312/นาที สูงกว่าค่าปกติขององค์กรมาก",
+    threatIoaPayload: "พบ Payload ลายเซ็นเดียวกันที่องค์กรอื่น",
+    threatIoaHours: "กิจกรรมกระจุกตัวนอกเวลาทำการ",
+    threatNoIncident: "ไม่มีแคมเปญที่เชื่อมโยงกับองค์กรของคุณ",
+    threatNoIncidentSub: "Pipeline B ยังเฝ้าระวัง Metadata แบบไม่ระบุตัวตนเพื่อหารูปแบบข้ามองค์กรอย่างต่อเนื่อง",
+    threatViewIncident: "เปิดเคสที่เชื่อมโยง",
+    threatPrivacyNote: "การวิเคราะห์ข้ามองค์กรทำบนค่าที่ผ่าน HMAC-SHA256 แล้ว องค์กรอื่นถูกแสดงเป็นกลุ่มอุตสาหกรรมเท่านั้น",
     auditActorDpo: "DPO (ณัฐกานต์)",
     auditActionGraceRequested: "ส่งคำร้องขอสิทธิ์ฉุกเฉินสำเร็จ",
     auditActionMaskingOn: "เปิดใช้งานการพรางข้อมูล (Masking ON)",

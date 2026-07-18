@@ -46,9 +46,84 @@ export const riskTelemetrySeries = [
   { t: "22:00", score: 10 },
 ];
 
-/** เฟส 1: ล้างข้อมูลออกให้เหลือเหตุวิกฤตเดียวเป็นแกนกลาง
- *  คิวนี้เก็บไว้เพื่อโชว์ empty state และรอเติมกลับในเฟส 4 */
-export const exemptionQueue: ExemptionCase[] = [];
+/** คิวประเมินข้อยกเว้นที่เชื่อมกับ INC-2026-0718-01 */
+export const exemptionQueue: ExemptionCase[] = [
+  {
+    id: "EX-2026-0001",
+    detectedAt: "2026-07-18 02:17",
+    requestVolume: 4380,
+    fieldsInvolved: ["allergy_records", "health_profile"],
+    maskedSample: "ALLERGY:***-MASK-*** | DRUG:***-MASK-***",
+    mitigation: "Deep Audit Logging เปิดใช้งาน · ข้อมูลสุขภาพผ่าน Re-encryption แล้ว",
+    scoreFactors: [
+      { label: "Data Sensitivity (ม.26)", value: "×5.0 — Critical" },
+      { label: "Affected Volume", value: "4,380 records" },
+      { label: "Masking Coverage", value: "100% masked post-detection" },
+      { label: "Breach Containment", value: "Confirmed within 6 min" },
+    ],
+    status: "Pending",
+  },
+  {
+    id: "EX-2026-0002",
+    detectedAt: "2026-07-18 02:18",
+    requestVolume: 15200,
+    fieldsInvolved: ["citizen_id", "full_name"],
+    maskedSample: "NID:1-XXXX-XXXXX-XX-X | NAME:***-MASK-***",
+    mitigation: "IP บล็อกแล้ว · Token หมุนเวียนครบ · Traffic Throttling เปิด",
+    scoreFactors: [
+      { label: "Data Sensitivity", value: "×2.0 — National ID" },
+      { label: "Affected Volume", value: "15,200 records" },
+      { label: "Exfiltration Confirmed", value: "Yes — must notify สคส." },
+      { label: "Post-containment Risk", value: "Low — no further leak" },
+    ],
+    status: "Rejected",
+  },
+  {
+    id: "EX-2026-0003",
+    detectedAt: "2026-07-18 02:20",
+    requestVolume: 812,
+    fieldsInvolved: ["session_token", "device_fingerprint"],
+    maskedSample: "SES:eyJ***REDACTED*** | DEV:fp_***MASK***",
+    mitigation: "Session tokens revoked ทั้งหมด · Device fingerprint purged จาก cache",
+    scoreFactors: [
+      { label: "Data Sensitivity", value: "×1.0 — Technical metadata" },
+      { label: "Affected Volume", value: "812 records" },
+      { label: "PII Exposure", value: "Indirect only" },
+      { label: "Forensic Status", value: "Under active investigation" },
+    ],
+    status: "Reviewing",
+  },
+  {
+    id: "EX-2026-0004",
+    detectedAt: "2026-07-18 02:21",
+    requestVolume: 230,
+    fieldsInvolved: ["email_address"],
+    maskedSample: "EMAIL:u***@***.com",
+    mitigation: "Email field masked · Downstream webhook ถูก suspend แล้ว",
+    scoreFactors: [
+      { label: "Data Sensitivity", value: "×1.0 — General PII" },
+      { label: "Affected Volume", value: "230 records" },
+      { label: "Masking Coverage", value: "100%" },
+      { label: "Risk Score", value: "Low (1.2/5.0)" },
+    ],
+    status: "Approved",
+  },
+  {
+    id: "EX-2026-0005",
+    detectedAt: "2026-07-18 02:22",
+    requestVolume: 96,
+    fieldsInvolved: ["phone_number", "address"],
+    maskedSample: "TEL:0XX-XXX-XXXX | ADDR:***-MASK-***",
+    mitigation: "Contact fields masked · Export job quarantined",
+    scoreFactors: [
+      { label: "Data Sensitivity", value: "×1.0 — General PII" },
+      { label: "Affected Volume", value: "96 records" },
+      { label: "Export Scope", value: "Internal batch only" },
+      { label: "Risk Score", value: "Low (0.9/5.0)" },
+    ],
+    status: "Pending",
+  },
+];
 
 export const bulkReasonOptions = [
   "ตรวจสอบแล้วเป็นทราฟฟิกทดสอบภายใน (Internal Load Test)",
@@ -66,7 +141,7 @@ export const incidents: IncidentData[] = [
   caseId: "INC-2026-0718-01",
   titleKey: "incidentTitle1",
   severity: "high_risk",
-  status: "awaiting_review",
+  status: "in_progress",
   detectedAt: "2026-07-18 02:15",
   // เหลือ 68:42:15 จากกรอบ 72 ชม.
   remainingSeconds: 68 * 3600 + 42 * 60 + 15,

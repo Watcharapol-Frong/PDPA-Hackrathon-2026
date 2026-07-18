@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { FileClock, LayoutDashboard, Radar, Settings, Siren, LogOut, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/lib/LanguageContext";
+import { useAppState } from "@/lib/AppStateContext";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -97,6 +98,8 @@ export function SidebarNavContent({
 }) {
   const { t } = useTranslation();
   const pathname = usePathname();
+  // จุดแดงเตือนขึ้นเฉพาะตอนมีเหตุค้างจริง ปิดคดีแล้วต้องหายไป
+  const { incident } = useAppState();
 
   return (
     <div className="flex flex-col h-full w-full">
@@ -111,7 +114,7 @@ export function SidebarNavContent({
             active={pathname === item.href}
             onClick={onNavigate}
             isOpen={isOpen}
-            alert={item.id === "incident"}
+            alert={item.id === "incident" && incident !== null}
           />
         ))}
       </nav>
