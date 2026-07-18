@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { AppShell } from "@/components/layout/app-shell";
 import { GlobalHealthBox } from "@/components/dashboard/global-health-box";
 import { KpiCard } from "@/components/dashboard/kpi-card";
@@ -13,8 +14,17 @@ import { useAppState } from "@/lib/AppStateContext";
 
 export default function DashboardPage() {
   const { language } = useTranslation();
+  const router = useRouter();
   // อ่านจาก store กลาง — ทุกหน้าเห็นสถานะเดียวกัน
-  const { incident, policy, legalState, updatePolicy, exemptionQueue: queue, approveExemptions } = useAppState();
+  const {
+    incident,
+    policy,
+    legalState,
+    updatePolicy,
+    exemptionQueue: queue,
+    approveExemptions,
+    escalateExemption,
+  } = useAppState();
   const [pendingGuard, setPendingGuard] = useState<"dataMasking" | "trafficThrottling" | null>(null);
   const policyRef = useRef<HTMLDivElement>(null);
 
@@ -27,7 +37,13 @@ export default function DashboardPage() {
   };
 
   const handleApprove = (ids: string[], reason: string) => approveExemptions(ids, reason);
-  const handleReject = (ids: string[]) => approveExemptions(ids, "Rejected by DPO");
+  // ตีกลับ = ประกาศว่าไม่เข้าเงื่อนไขยกเว้น → ยกระดับเป็นเหตุวิกฤตจริงแล้วพาไปที่เคสนั้น
+  const handleReject = (ids: string[]) => {
+    const newCaseId = ids
+      .map((id) => escalateExemption(id, "DPO rejected the exemption — escalated for reporting"))
+      .find(Boolean);
+    if (newCaseId) router.push(`/crisis-room/${encodeURIComponent(newCaseId)}`);
+  };
 
   const pendingKpi = {
     ...kpiCards[2],

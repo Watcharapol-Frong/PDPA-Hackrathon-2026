@@ -49,7 +49,7 @@ export default function RootLayout({
       <body className="min-h-full font-sans">
         <LanguageProvider>
           <AppStateProvider
-            initialIncident={incidents[0] ?? null}
+            initialIncidents={incidents}
             initialExemptions={exemptionQueue}
             initialAuditLog={initialAuditLog}
           >

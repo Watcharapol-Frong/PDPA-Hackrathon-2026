@@ -32,9 +32,9 @@ export default function DocumentWorkspacePage() {
   const router = useRouter();
   const { t, language } = useTranslation();
   // อ่านเคสจาก store — ยื่นรายงานแล้วเคสจะถูกปิดและทุกหน้าอัปเดตพร้อมกัน
-  const { incident: activeIncident, resolveIncident } = useAppState();
-  const incident =
-    activeIncident?.caseId === decodeURIComponent(params.caseId) ? activeIncident : undefined;
+  const { getIncident, fileDocument, canCloseCase, resolveIncident } = useAppState();
+  const caseId = decodeURIComponent(params.caseId);
+  const incident = getIncident(caseId);
 
   // State for form inputs (DPO composition)
   const [dpoName, setDpoName] = useState("Watcharapol Charoensuk");
@@ -73,15 +73,21 @@ export default function DocumentWorkspacePage() {
     setTimeout(() => {
       setIsSubmitting(false);
       setSubmitSuccess(true);
+      // บันทึกว่ายื่นรายงาน สคส. แล้ว — State 3 ยังปิดคดีไม่ได้จนกว่าจะออกจดหมายแจ้งลูกค้าด้วย
+      fileDocument(caseId, "pdpcReport");
     }, 1500);
   };
 
   // ปิดคดีตอนผู้ใช้กดรับทราบ ไม่ใช่ตอนกดส่ง — ไม่งั้นเคสหายไปก่อนที่ dialog สำเร็จจะทันแสดง
   const acknowledgeAndClose = () => {
-    const target = `/crisis-room`;
     setSubmitSuccess(false);
-    resolveIncident();
-    router.push(target);
+    // ปิดคดีได้เฉพาะเมื่อเอกสารครบตามระดับความเสี่ยง ไม่งั้นกลับไปหน้าเคสเพื่อทำต่อ
+    if (canCloseCase(caseId)) {
+      resolveIncident(caseId);
+      router.push("/crisis-room");
+    } else {
+      router.push(`/crisis-room/${encodeURIComponent(caseId)}`);
+    }
   };
 
   const handleDownload = () => {

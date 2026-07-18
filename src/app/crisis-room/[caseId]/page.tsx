@@ -17,9 +17,10 @@ import { useAppState } from "@/lib/AppStateContext";
 export default function IncidentDetailPage() {
   const params = useParams<{ caseId: string }>();
   // Action Flow B — สถานะขอขยายเวลาอยู่ใน store กลาง หน้าอื่นจึงเห็นผลทันที
-  const { incident: activeIncident, gracePending } = useAppState();
+  const { getIncident, isGracePending } = useAppState();
   const caseId = decodeURIComponent(params.caseId);
-  const incident = activeIncident?.caseId === caseId ? activeIncident : undefined;
+  const incident = getIncident(caseId);
+  const gracePending = isGracePending(caseId);
   const { t } = useTranslation();
 
   if (!incident) {

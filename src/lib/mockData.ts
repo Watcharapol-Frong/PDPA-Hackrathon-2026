@@ -46,82 +46,61 @@ export const riskTelemetrySeries = [
   { t: "22:00", score: 10 },
 ];
 
-/** คิวประเมินข้อยกเว้นที่เชื่อมกับ INC-2026-0718-01 */
+/**
+ * คิวเคสที่เข้าเงื่อนไขยกเว้น (State 1b)
+ * ทุกเคสในนี้เป็นคนละแถวข้อมูลกับเหตุวิกฤตในห้องวิกฤต — ไม่นับซ้ำกัน
+ */
 export const exemptionQueue: ExemptionCase[] = [
   {
-    id: "EX-2026-0001",
-    detectedAt: "2026-07-18 02:17",
-    requestVolume: 4380,
-    fieldsInvolved: ["allergy_records", "health_profile"],
-    maskedSample: "ALLERGY:***-MASK-*** | DRUG:***-MASK-***",
-    mitigation: "Deep Audit Logging เปิดใช้งาน · ข้อมูลสุขภาพผ่าน Re-encryption แล้ว",
+    id: "CASE-2026-0003",
+    legalState: "1b",
+    detectedAt: "2026-07-18 02:20",
+    requestVolume: 320,
+    fieldsInvolved: ["session_token", "device_fingerprint"],
+    maskedSample: "SESSION:***-MASK-*** | DEVICE:***-MASK-***",
+    mitigation: "เข้ารหัสทั้งชุดก่อนออกจากระบบ · Token หมุนเวียนแล้ว",
+    mitigationFactor: 10,
     scoreFactors: [
-      { label: "Data Sensitivity (ม.26)", value: "×5.0 — Critical" },
-      { label: "Affected Volume", value: "4,380 records" },
-      { label: "Masking Coverage", value: "100% masked post-detection" },
-      { label: "Breach Containment", value: "Confirmed within 6 min" },
+      { label: "Data Sensitivity", value: "×0.5 — ข้อมูลระบบ ไม่ใช่ PII โดยตรง" },
+      { label: "Affected Volume", value: "320 records" },
+      { label: "Mitigation Factor (M)", value: "10.0 — เข้ารหัสครบถ้วน" },
+      { label: "Residual Risk", value: "ไม่มีความเสี่ยงต่อเจ้าของข้อมูล" },
     ],
     status: "Pending",
   },
   {
-    id: "EX-2026-0002",
-    detectedAt: "2026-07-18 02:18",
-    requestVolume: 15200,
-    fieldsInvolved: ["citizen_id", "full_name"],
-    maskedSample: "NID:1-XXXX-XXXXX-XX-X | NAME:***-MASK-***",
-    mitigation: "IP บล็อกแล้ว · Token หมุนเวียนครบ · Traffic Throttling เปิด",
-    scoreFactors: [
-      { label: "Data Sensitivity", value: "×2.0 — National ID" },
-      { label: "Affected Volume", value: "15,200 records" },
-      { label: "Exfiltration Confirmed", value: "Yes — must notify สคส." },
-      { label: "Post-containment Risk", value: "Low — no further leak" },
-    ],
-    status: "Rejected",
-  },
-  {
-    id: "EX-2026-0003",
-    detectedAt: "2026-07-18 02:20",
-    requestVolume: 812,
-    fieldsInvolved: ["session_token", "device_fingerprint"],
-    maskedSample: "SES:eyJ***REDACTED*** | DEV:fp_***MASK***",
-    mitigation: "Session tokens revoked ทั้งหมด · Device fingerprint purged จาก cache",
-    scoreFactors: [
-      { label: "Data Sensitivity", value: "×1.0 — Technical metadata" },
-      { label: "Affected Volume", value: "812 records" },
-      { label: "PII Exposure", value: "Indirect only" },
-      { label: "Forensic Status", value: "Under active investigation" },
-    ],
-    status: "Reviewing",
-  },
-  {
-    id: "EX-2026-0004",
+    id: "CASE-2026-0004",
+    legalState: "1b",
     detectedAt: "2026-07-18 02:21",
-    requestVolume: 230,
-    fieldsInvolved: ["email_address"],
-    maskedSample: "EMAIL:u***@***.com",
-    mitigation: "Email field masked · Downstream webhook ถูก suspend แล้ว",
+    requestVolume: 890,
+    fieldsInvolved: ["phone_number", "address"],
+    maskedSample: "PHONE:08X-XXX-XXXX | ADDR:***-MASK-***",
+    mitigation: "พรางค่าก่อนส่งออก · Export job ถูกกักไว้",
+    mitigationFactor: 5,
     scoreFactors: [
-      { label: "Data Sensitivity", value: "×1.0 — General PII" },
-      { label: "Affected Volume", value: "230 records" },
-      { label: "Masking Coverage", value: "100%" },
-      { label: "Risk Score", value: "Low (1.2/5.0)" },
+      { label: "Data Sensitivity", value: "×1.0 — ข้อมูลติดต่อทั่วไป" },
+      { label: "Affected Volume", value: "890 records" },
+      { label: "Mitigation Factor (M)", value: "5.0 — พรางค่าระหว่างส่ง" },
+      { label: "Residual Risk", value: "ต่ำ — ไม่พบการนำข้อมูลไปใช้ต่อ" },
+    ],
+    status: "Pending",
+  },
+  {
+    id: "CASE-2026-0005",
+    legalState: "1b",
+    detectedAt: "2026-07-18 02:22",
+    requestVolume: 12,
+    fieldsInvolved: ["email_address"],
+    maskedSample: "EMAIL:qa-***@internal.test",
+    mitigation: "ทราฟฟิกทดสอบภายใน · เข้ารหัสครบ",
+    mitigationFactor: 10,
+    scoreFactors: [
+      { label: "Data Sensitivity", value: "×1.0 — อีเมลทดสอบภายใน" },
+      { label: "Affected Volume", value: "12 records" },
+      { label: "Mitigation Factor (M)", value: "10.0 — เข้ารหัสครบถ้วน" },
+      { label: "Residual Risk", value: "ไม่มี — ไม่ใช่ข้อมูลลูกค้าจริง" },
     ],
     status: "Approved",
-  },
-  {
-    id: "EX-2026-0005",
-    detectedAt: "2026-07-18 02:22",
-    requestVolume: 96,
-    fieldsInvolved: ["phone_number", "address"],
-    maskedSample: "TEL:0XX-XXX-XXXX | ADDR:***-MASK-***",
-    mitigation: "Contact fields masked · Export job quarantined",
-    scoreFactors: [
-      { label: "Data Sensitivity", value: "×1.0 — General PII" },
-      { label: "Affected Volume", value: "96 records" },
-      { label: "Export Scope", value: "Internal batch only" },
-      { label: "Risk Score", value: "Low (0.9/5.0)" },
-    ],
-    status: "Pending",
   },
 ];
 
@@ -194,6 +173,44 @@ export const incidents: IncidentData[] = [
     { from: "gateway", to: "database", labelKey: "edgeExfil" },
   ],
   aiSummaryKey: "aiSummary1",
+  },
+
+  {
+    caseId: "INC-2026-0718-02",
+    titleKey: "incidentTitle3",
+    // State 2 — เสี่ยงจริงแต่ไม่ถึงระดับสูง: แจ้ง สคส. อย่างเดียว ไม่ต้องแจ้งเจ้าของข้อมูล
+    severity: "risk_present",
+    status: "awaiting_review",
+    detectedAt: "2026-07-18 02:19",
+    remainingSeconds: 61 * 3600 + 12 * 60 + 40,
+    affectedRows: 2400,
+    compromisedFields: [
+      {
+        id: "email",
+        labelKey: "piiEmail",
+        column: "contact_email",
+        table: "marketing.subscriber",
+        dataType: "VARCHAR(255)",
+        sensitivity: "sensitivityGeneral",
+        affectedRows: 2400,
+        leaked: true,
+      },
+    ],
+    timeline: [
+      { time: "02:19", labelKey: "timeline3a", severity: "warning" },
+      { time: "02:24", labelKey: "timeline3b", severity: "warning" },
+      { time: "02:31", labelKey: "timeline3c", severity: "info" },
+    ],
+    nodes: [
+      { id: "attacker", labelKey: "nodeInternalScript", kind: "attacker", x: 12, y: 50 },
+      { id: "gateway", labelKey: "nodeGateway", kind: "gateway", x: 50, y: 50 },
+      { id: "database", labelKey: "nodeMarketingDb", kind: "database", x: 88, y: 50 },
+    ],
+    edges: [
+      { from: "attacker", to: "gateway", labelKey: "edgeMisconfig" },
+      { from: "gateway", to: "database", labelKey: "edgeExport" },
+    ],
+    aiSummaryKey: "aiSummary3",
   },
 ];
 

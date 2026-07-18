@@ -368,6 +368,13 @@ const translations = {
     auditActionThrottleOff: "Traffic Throttling Disabled",
     auditActionExemptionApproved: "Form 5 Exemption Approved & Recorded",
     auditActionCaseResolved: "Crisis Incident Resolved & Closed",
+    auditActionExemptionRejected: "Exemption rejected — escalated to a reportable incident",
+    auditActionReportFiled: "PDPC incident report filed",
+    auditActionNoticeIssued: "Data subject remediation notice issued",
+    incidentEscalatedTitle: "Escalated from exemption review — DPO rejected the exemption",
+    piiEscalatedField: "Escalated PII field",
+    timelineEscalated: "DPO rejected the exemption — case escalated for reporting",
+    aiSummaryEscalated: "Escalated by DPO judgement rather than automated scoring. Pipeline B found no cross-tenant campaign match for this case.",
   },
   th: {
     // Topbar
@@ -389,7 +396,7 @@ const translations = {
     notifMsg3: "สำรองข้อมูลระบบอัตโนมัติประจำวันเสร็จสิ้น: ความจุคงเหลือ 98.4%",
 
     // Sidebar Items
-    menuOverview: "Overview",
+    menuOverview: "ภาพรวมระบบ",
     menuOverviewSub: "Operational Command Center",
     menuIncident: "ห้องจัดการเหตุวิกฤต",
     menuIncidentSub: "Active Incident Room",
@@ -605,7 +612,7 @@ const translations = {
     reportStatusDraft: "ฉบับร่าง",
 
     // ปุ่มย้อนกลับ
-    crisisBackToOverview: "กลับไปหน้า Overview",
+    crisisBackToOverview: "กลับไปหน้า ภาพรวมระบบ",
 
     /* ── คิวเหตุวิกฤต (หน้ารายการ) ── */
     incidentListTitle: "คิวเหตุวิกฤตที่กำลังดำเนินการ",
@@ -725,6 +732,13 @@ const translations = {
     auditActionThrottleOff: "ปิดการจำกัดความเร็ว (Throttle OFF)",
     auditActionExemptionApproved: "อนุมัติข้อยกเว้นและลงบันทึก Form 5 สำเร็จ",
     auditActionCaseResolved: "ยุติอุบัติการณ์วิกฤตและจัดเก็บคดีสำเร็จ",
+    auditActionExemptionRejected: "ตีกลับข้อยกเว้น — ยกระดับเป็นเหตุที่ต้องรายงาน",
+    auditActionReportFiled: "ยื่นรายงานอุบัติการณ์ต่อ สคส. แล้ว",
+    auditActionNoticeIssued: "ออกจดหมายแจ้งเจ้าของข้อมูลแล้ว",
+    incidentEscalatedTitle: "ยกระดับจากการประเมินข้อยกเว้น — DPO ตีกลับคำขอยกเว้น",
+    piiEscalatedField: "ฟิลด์ข้อมูลที่ถูกยกระดับ",
+    timelineEscalated: "DPO ตีกลับข้อยกเว้น — ยกระดับเคสเพื่อรายงาน",
+    aiSummaryEscalated: "ยกระดับด้วยดุลพินิจของ DPO ไม่ใช่จากคะแนนอัตโนมัติ Pipeline B ไม่พบความเชื่อมโยงกับแคมเปญข้ามองค์กรสำหรับเคสนี้",
   },
 };
 

@@ -11,11 +11,11 @@ import { useAppState } from "@/lib/AppStateContext";
 export default function CrisisRoomListPage() {
   const { t } = useTranslation();
   // เหตุที่ยังไม่ปิดเท่านั้น — ปิดคดีแล้วรายการจะหายไปเองทุกหน้า
-  const { incident, gracePending } = useAppState();
+  const { incidents: liveIncidents, isGracePending } = useAppState();
   // สถานะในตารางต้องสะท้อน action ที่เพิ่งทำในหน้ารายละเอียด ไม่ใช่ค่าตั้งต้น
-  const incidents = incident
-    ? [{ ...incident, status: gracePending ? ("grace_requested" as const) : incident.status }]
-    : [];
+  const incidents = liveIncidents.map((i) =>
+    isGracePending(i.caseId) ? { ...i, status: "grace_requested" as const } : i,
+  );
 
   return (
     <AppShell alertActive guardEnabled={false}>

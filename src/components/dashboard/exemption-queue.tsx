@@ -46,7 +46,6 @@ interface ExemptionQueueProps {
   onReject?: (ids: string[]) => void;
 }
 
-type FilterStatus = "All" | "Pending" | "Reviewing" | "Approved" | "Rejected";
 type FilterRisk = "ALL_RISK" | "High" | "Medium" | "Low";
 
 export function ExemptionQueue({ queue, onApprove, onReject }: ExemptionQueueProps) {
@@ -57,28 +56,25 @@ export function ExemptionQueue({ queue, onApprove, onReject }: ExemptionQueuePro
   const [bulkNote, setBulkNote] = useState("");
   const [bulkConfirmed, setBulkConfirmed] = useState(false);
   const [verifiedDoc, setVerifiedDoc] = useState(false);
-  const [statusFilter, setStatusFilter] = useState<FilterStatus>("All");
   const [riskFilter, setRiskFilter] = useState<FilterRisk>("ALL_RISK");
   const { t, tArray, language } = useTranslation();
   const isEn = language === "en";
 
   const bulkReasonOptions = tArray("bulkReasonOptions");
 
-  // Helper to resolve risk level primarily based on Legal Status
-  const getRiskLevel = (status: ExemptionCase["status"], id: string): "High" | "Medium" | "Low" => {
-    if (status === "Rejected") return "High";
-    if (status === "Approved") return "Low";
-    if (status === "Reviewing") return "Medium";
-    // For Pending (Awaiting Assessment) cases, resolve based on preliminary review:
-    if (id === "EX-2026-0001") return "Medium"; // Under evaluation (potential risk)
-    return "Low"; // General PII
+  /**
+   * ความเสี่ยงมาจากตัวเหตุ ไม่ใช่จากการที่ DPO กดปุ่ม
+   * ยิ่ง Mitigation Factor (M) สูง = มาตรการป้องกันได้ผลมาก = ความเสี่ยงคงเหลือยิ่งต่ำ
+   */
+  const getRiskLevel = (c: ExemptionCase): "High" | "Medium" | "Low" => {
+    if (c.legalState === "3") return "High";
+    if (c.legalState === "2") return "Medium";
+    return c.mitigationFactor >= 10 ? "Low" : "Medium";
   };
 
-  // Dual Filtering Logic
+  // Filtering Logic (Risk Level only)
   const filteredQueue = queue.filter((c) => {
-    const matchesStatus = statusFilter === "All" || c.status === statusFilter;
-    const matchesRisk = riskFilter === "ALL_RISK" || getRiskLevel(c.status, c.id) === riskFilter;
-    return matchesStatus && matchesRisk;
+    return riskFilter === "ALL_RISK" || getRiskLevel(c) === riskFilter;
   });
 
   const pendingCases = filteredQueue.filter((c) => c.status === "Pending");
@@ -179,14 +175,6 @@ export function ExemptionQueue({ queue, onApprove, onReject }: ExemptionQueuePro
     </div>
   );
 
-  const filterTabs: { value: FilterStatus; labelEn: string; labelTh: string; count: number }[] = [
-    { value: "All", labelEn: "All Statuses", labelTh: "ทุกสถานะ", count: queue.length },
-    { value: "Pending", labelEn: "Pending", labelTh: "รอประเมิน", count: queue.filter((c) => c.status === "Pending").length },
-    { value: "Reviewing", labelEn: "Reviewing", labelTh: "ตรวจสอบ", count: queue.filter((c) => c.status === "Reviewing").length },
-    { value: "Approved", labelEn: "Approved", labelTh: "ผ่านเกณฑ์", count: queue.filter((c) => c.status === "Approved").length },
-    { value: "Rejected", labelEn: "Rejected", labelTh: "ปฏิเสธ/ส่ง สคส.", count: queue.filter((c) => c.status === "Rejected").length },
-  ];
-
   return (
     <Card className="h-full flex flex-col" size="sm">
       <CardHeader className="pb-3 border-b bg-muted/5">
@@ -195,75 +183,41 @@ export function ExemptionQueue({ queue, onApprove, onReject }: ExemptionQueuePro
             <CardTitle className="text-sm font-semibold tracking-tight">{t("queueTitle")}</CardTitle>
             <CardDescription className="text-[11px] text-muted-foreground mt-0.5">{t("queueSub")}</CardDescription>
           </div>
-          <Button
-            onClick={() => setBulkOpen(true)}
-            disabled={selected.length === 0}
-            size="sm"
-            className={cn(
-              "shrink-0 font-bold text-xs h-8 gap-1.5 cursor-pointer shadow-none",
-              selected.length > 0 ? "bg-brand-warning hover:bg-brand-warning/90 text-white" : "bg-muted text-muted-foreground"
-            )}
-          >
-            <CheckSquare className="size-3.5" />
-            <span>{t("bulkApprove")}</span>
-            {selected.length > 0 && (
-              <span className="font-mono text-[10px] bg-white/20 px-1 rounded-sm ml-0.5">{selected.length}</span>
-            )}
-          </Button>
-        </div>
-
-        {/* Dual Toolbar Filter Panel */}
-        <div className="flex flex-col sm:flex-row gap-3 pt-3 mt-3 border-t">
-          {/* Filter 1: Status Tabs (Left) */}
-          <div className="flex flex-wrap items-center gap-1.5 flex-1">
-            <span className="text-[9px] text-muted-foreground font-bold uppercase tracking-wider flex items-center gap-1 shrink-0">
-              <ListFilter className="size-3 text-primary" />
-              {isEn ? "Status:" : "สถานะ:"}
-            </span>
-            <div className="flex flex-wrap gap-0.5 bg-muted/40 p-0.5 rounded-lg border">
-              {filterTabs.map((tab) => {
-                const isActive = statusFilter === tab.value;
-                return (
-                  <button
-                    key={tab.value}
-                    onClick={() => setStatusFilter(tab.value)}
-                    className={cn(
-                      "px-2 py-0.5 text-[10px] font-bold rounded-md transition-all cursor-pointer flex items-center gap-1",
-                      isActive
-                        ? "bg-card text-foreground shadow-xs border"
-                        : "text-muted-foreground hover:text-foreground hover:bg-muted/30"
-                    )}
-                  >
-                    <span>{isEn ? tab.labelEn : tab.labelTh}</span>
-                    <span className={cn(
-                      "font-mono text-[8px] px-1 rounded-full",
-                      isActive ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
-                    )}>
-                      {tab.count}
-                    </span>
-                  </button>
-                );
-              })}
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Risk Level Selector */}
+            <div className="flex items-center gap-2">
+              <span className="text-[9px] text-muted-foreground font-bold uppercase tracking-wider flex items-center gap-1 shrink-0">
+                <AlertTriangle className="size-3 text-amber-500" />
+                {isEn ? "Risk Level:" : "ความเสี่ยง:"}
+              </span>
+              <Select value={riskFilter} onValueChange={(val) => setRiskFilter(val as FilterRisk)}>
+                <SelectTrigger className="w-[125px] h-7 text-[10px] font-bold rounded-lg px-2 shadow-none bg-card">
+                  <SelectValue placeholder="All Risk Levels" />
+                </SelectTrigger>
+                <SelectContent className="rounded-lg">
+                  <SelectItem value="ALL_RISK" className="text-[10px] font-semibold">{isEn ? "All Risks" : "ทุกระดับความเสี่ยง"}</SelectItem>
+                  <SelectItem value="High" className="text-[10px] font-semibold text-red-600">🔴 {isEn ? "High Risk" : "เสี่ยงสูง"}</SelectItem>
+                  <SelectItem value="Medium" className="text-[10px] font-semibold text-amber-600">🟡 {isEn ? "Medium Risk" : "เสี่ยงปานกลาง"}</SelectItem>
+                  <SelectItem value="Low" className="text-[10px] font-semibold text-slate-600">🟢 {isEn ? "Low Risk" : "เสี่ยงต่ำ"}</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-          </div>
 
-          {/* Filter 2: Risk Dropdown Selector (Right) */}
-          <div className="flex items-center gap-2 self-start sm:self-center">
-            <span className="text-[9px] text-muted-foreground font-bold uppercase tracking-wider flex items-center gap-1 shrink-0">
-              <AlertTriangle className="size-3 text-amber-500" />
-              {isEn ? "Risk Level:" : "ความเสี่ยง:"}
-            </span>
-            <Select value={riskFilter} onValueChange={(val) => setRiskFilter(val as FilterRisk)}>
-              <SelectTrigger className="w-[125px] h-7 text-[10px] font-bold rounded-lg px-2">
-                <SelectValue placeholder="All Risk Levels" />
-              </SelectTrigger>
-              <SelectContent className="rounded-lg">
-                <SelectItem value="ALL_RISK" className="text-[10px] font-semibold">{isEn ? "All Risks" : "ทุกระดับความเสี่ยง"}</SelectItem>
-                <SelectItem value="High" className="text-[10px] font-semibold text-red-600">🔴 {isEn ? "High Risk" : "เสี่ยงสูง"}</SelectItem>
-                <SelectItem value="Medium" className="text-[10px] font-semibold text-amber-600">🟡 {isEn ? "Medium Risk" : "เสี่ยงปานกลาง"}</SelectItem>
-                <SelectItem value="Low" className="text-[10px] font-semibold text-slate-600">🟢 {isEn ? "Low Risk" : "เสี่ยงต่ำ"}</SelectItem>
-              </SelectContent>
-            </Select>
+            <Button
+              onClick={() => setBulkOpen(true)}
+              disabled={selected.length === 0}
+              size="sm"
+              className={cn(
+                "shrink-0 font-bold text-xs h-8 gap-1.5 cursor-pointer shadow-none",
+                selected.length > 0 ? "bg-brand-warning hover:bg-brand-warning/90 text-white" : "bg-muted text-muted-foreground"
+              )}
+            >
+              <CheckSquare className="size-3.5" />
+              <span>{t("bulkApprove")}</span>
+              {selected.length > 0 && (
+                <span className="font-mono text-[10px] bg-white/20 px-1 rounded-sm ml-0.5">{selected.length}</span>
+              )}
+            </Button>
           </div>
         </div>
       </CardHeader>
@@ -300,7 +254,7 @@ export function ExemptionQueue({ queue, onApprove, onReject }: ExemptionQueuePro
                   const isSelected = selected.includes(c.id);
                   const isPending = c.status === "Pending";
                   const isRejected = c.status === "Rejected";
-                  const riskLevel = getRiskLevel(c.status, c.id);
+                  const riskLevel = getRiskLevel(c);
                   return (
                     <TableRow
                       key={c.id}
@@ -373,7 +327,7 @@ export function ExemptionQueue({ queue, onApprove, onReject }: ExemptionQueuePro
                 <div className="lg:col-span-5 space-y-4">
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{isEn ? "Risk Rating" : "ระดับความเสี่ยง"}</span>
-                    {getRiskBadge(getRiskLevel(detailCase.status, detailCase.id))}
+                    {getRiskBadge(getRiskLevel(detailCase))}
                   </div>
                   <div>
                     <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">{t("rawSample")}</p>
@@ -543,7 +497,7 @@ export function ExemptionQueue({ queue, onApprove, onReject }: ExemptionQueuePro
               <div className="space-y-4 pt-1">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{isEn ? "Risk Rating" : "ระดับความเสี่ยง"}</span>
-                  {getRiskBadge(getRiskLevel(detailCase.status, detailCase.id))}
+                  {getRiskBadge(getRiskLevel(detailCase))}
                 </div>
                 <div>
                   <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">
@@ -606,7 +560,7 @@ export function ExemptionQueue({ queue, onApprove, onReject }: ExemptionQueuePro
               <div className="space-y-4 pt-1">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{isEn ? "Risk Rating" : "ระดับความเสี่ยง"}</span>
-                  {getRiskBadge(getRiskLevel(detailCase.status, detailCase.id))}
+                  {getRiskBadge(getRiskLevel(detailCase))}
                 </div>
                 <div className="border border-emerald-200 dark:border-emerald-800/40 rounded-xl overflow-hidden">
                   <div className="bg-emerald-600 px-4 py-2.5 flex items-center justify-between">
@@ -676,7 +630,7 @@ export function ExemptionQueue({ queue, onApprove, onReject }: ExemptionQueuePro
               <div className="space-y-4 pt-1">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{isEn ? "Risk Rating" : "ระดับความเสี่ยง"}</span>
-                  {getRiskBadge(getRiskLevel(detailCase.status, detailCase.id))}
+                  {getRiskBadge(getRiskLevel(detailCase))}
                 </div>
                 {/* Urgency banner */}
                 <div className="flex items-start gap-2.5 p-3 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800/50 rounded-xl">

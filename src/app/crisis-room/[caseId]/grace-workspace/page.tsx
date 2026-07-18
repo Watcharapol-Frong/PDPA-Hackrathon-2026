@@ -44,9 +44,10 @@ export default function GraceWorkspacePage() {
   const router = useRouter();
   const { t, language } = useTranslation();
   // อ่านเคสจาก store — ปิดคดีแล้วหน้านี้จะขึ้น "ไม่พบเคส" เองอัตโนมัติ
-  const { incident: activeIncident, gracePending, requestGracePeriod } = useAppState();
-  const incident =
-    activeIncident?.caseId === decodeURIComponent(params.caseId) ? activeIncident : undefined;
+  const { getIncident, isGracePending, requestGracePeriod } = useAppState();
+  const caseId = decodeURIComponent(params.caseId);
+  const incident = getIncident(caseId);
+  const gracePending = isGracePending(caseId);
 
   // Form state
   const [dpoName, setDpoName] = useState("Watcharapol Charoensuk");
@@ -78,7 +79,7 @@ export default function GraceWorkspacePage() {
     if (!canSubmit) return;
     setIsSubmitting(true);
     setTimeout(() => {
-      requestGracePeriod(selectedReason as TranslationKey, circumstance);
+      requestGracePeriod(caseId, selectedReason as TranslationKey, circumstance);
       setIsSubmitting(false);
       setSubmitSuccess(true);
     }, 1500);
