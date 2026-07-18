@@ -7,14 +7,14 @@ import { KpiCard } from "@/components/dashboard/kpi-card";
 import { RiskTelemetryChart } from "@/components/dashboard/risk-telemetry-chart";
 import { ExemptionQueue } from "@/components/dashboard/exemption-queue";
 import { PolicyCenter } from "@/components/dashboard/policy-center";
-import { exemptionQueue as initialQueue, kpiCards } from "@/lib/mockData";
-import type { ExemptionCase, PolicyState } from "@/lib/types";
+import { kpiCards } from "@/lib/mockData";
 import { useTranslation } from "@/lib/LanguageContext";
+import { useAppState } from "@/lib/AppStateContext";
 
 export default function DashboardPage() {
   const { language } = useTranslation();
-  const [policy, setPolicy] = useState<PolicyState>({ dataMasking: false, trafficThrottling: false });
-  const [queue, setQueue] = useState<ExemptionCase[]>(initialQueue);
+  // อ่านจาก store กลาง — ทุกหน้าเห็นสถานะเดียวกัน
+  const { incident, policy, updatePolicy, exemptionQueue: queue, approveExemptions } = useAppState();
   const [pendingGuard, setPendingGuard] = useState<"dataMasking" | "trafficThrottling" | null>(null);
   const policyRef = useRef<HTMLDivElement>(null);
 
@@ -26,24 +26,16 @@ export default function DashboardPage() {
     setTimeout(() => setPendingGuard("trafficThrottling"), 450);
   };
 
-  const handleApprove = (ids: string[]) => {
-    setQueue((q) =>
-      q.map((c) => (ids.includes(c.id) ? { ...c, status: "Approved" as const } : c))
-    );
-  };
-
-  const handleReject = (ids: string[]) => {
-    setQueue((q) =>
-      q.map((c) => (ids.includes(c.id) ? { ...c, status: "Rejected" as const } : c))
-    );
-  };
+  const handleApprove = (ids: string[], reason: string) => approveExemptions(ids, reason);
+  const handleReject = (ids: string[]) => approveExemptions(ids, "Rejected by DPO");
 
   const pendingKpi = {
     ...kpiCards[2],
     value: String(queue.filter((c) => c.status === "Pending").length),
   };
 
-  const hasActiveThreat = !policy.trafficThrottling;
+  // แถบวิ่งสีแดงขึ้นเมื่อ "มีเหตุวิกฤตค้างอยู่จริง" และยังไม่เปิดเกราะที่ สคส. แนะนำ
+  const hasActiveThreat = incident !== null && !policy.trafficThrottling;
 
   return (
     <AppShell
@@ -87,7 +79,7 @@ export default function DashboardPage() {
               <GlobalHealthBox
                 policy={policy}
                 pendingCount={queue.filter((c) => c.status === "Pending").length}
-                hasActiveThreat={hasActiveThreat}
+                hasActiveThreat={incident !== null}
               />
             </div>
             <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
@@ -113,7 +105,7 @@ export default function DashboardPage() {
               <PolicyCenter
                 ref={policyRef}
                 policy={policy}
-                onChange={setPolicy}
+                onChange={updatePolicy}
                 pendingGuard={pendingGuard}
                 onPendingConsumed={() => setPendingGuard(null)}
               />

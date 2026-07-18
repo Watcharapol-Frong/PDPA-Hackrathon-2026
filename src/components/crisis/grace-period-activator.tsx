@@ -21,11 +21,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { gracePeriodReasonKeys } from "@/lib/mockData";
-import { useTranslation } from "@/lib/LanguageContext";
+import { useTranslation, type TranslationKey } from "@/lib/LanguageContext";
 
 interface GracePeriodActivatorProps {
   sent: boolean;
-  onSent: () => void;
+  /** ส่งเหตุผลที่ DPO เลือกขึ้นไปด้วย เพื่อสลักลง WORM Log */
+  onSent: (rationaleKey: TranslationKey, note?: string) => void;
 }
 
 export function GracePeriodActivator({ sent, onSent }: GracePeriodActivatorProps) {
@@ -38,7 +39,7 @@ export function GracePeriodActivator({ sent, onSent }: GracePeriodActivatorProps
   const canSubmit = reason !== "" && certified && !sent;
 
   const submit = () => {
-    onSent();
+    onSent(reason as TranslationKey);
     setSuccessOpen(true);
   };
 

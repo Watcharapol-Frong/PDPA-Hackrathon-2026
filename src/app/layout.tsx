@@ -28,6 +28,8 @@ export const metadata: Metadata = {
 };
 
 import { LanguageProvider } from "@/lib/LanguageContext";
+import { AppStateProvider } from "@/lib/AppStateContext";
+import { incidents, exemptionQueue, initialAuditLog } from "@/lib/mockData";
 
 export default function RootLayout({
   children,
@@ -45,7 +47,15 @@ export default function RootLayout({
       )}
     >
       <body className="min-h-full font-sans">
-        <LanguageProvider>{children}</LanguageProvider>
+        <LanguageProvider>
+          <AppStateProvider
+            initialIncident={incidents[0] ?? null}
+            initialExemptions={exemptionQueue}
+            initialAuditLog={initialAuditLog}
+          >
+            {children}
+          </AppStateProvider>
+        </LanguageProvider>
       </body>
     </html>
   );

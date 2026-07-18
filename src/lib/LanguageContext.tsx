@@ -308,6 +308,11 @@ const translations = {
     aiSummary3: "No external attacker detected. Root cause is an internally-triggered batch job whose export scope was configured too broadly.",
     incidentNotFound: "Incident not found",
     incidentNotFoundSub: "This case ID does not exist or has already been archived.",
+
+    /* ── Immutable audit log (WORM) ── */
+    auditActorSystem: "System (Edge Proxy)",
+    auditActionDetected: "Anomalous traffic detected at Edge Proxy",
+    auditActionExfiltration: "Data exfiltration confirmed",
     auditActorDpo: "DPO (Nattakarn)",
     auditActionGraceRequested: "Emergency Grace Period Requested",
     auditActionMaskingOn: "Data Masking Enabled",
@@ -613,6 +618,11 @@ const translations = {
     aiSummary3: "ไม่พบผู้โจมตีจากภายนอก ต้นเหตุคืองาน Batch ภายในองค์กรที่ตั้งขอบเขตการส่งออกข้อมูลกว้างเกินไป",
     incidentNotFound: "ไม่พบเคสนี้",
     incidentNotFoundSub: "เลขที่คดีนี้ไม่มีอยู่ในระบบ หรือถูกจัดเก็บเข้าคลังถาวรแล้ว",
+
+    /* ── บันทึกพยานหลักฐานดิจิทัล (WORM) ── */
+    auditActorSystem: "ระบบ (Edge Proxy)",
+    auditActionDetected: "ตรวจพบทราฟฟิกผิดปกติที่ Edge Proxy",
+    auditActionExfiltration: "ยืนยันข้อมูลรั่วไหล",
     auditActorDpo: "DPO (ณัฐกานต์)",
     auditActionGraceRequested: "ส่งคำร้องขอสิทธิ์ฉุกเฉินสำเร็จ",
     auditActionMaskingOn: "เปิดใช้งานการพรางข้อมูล (Masking ON)",

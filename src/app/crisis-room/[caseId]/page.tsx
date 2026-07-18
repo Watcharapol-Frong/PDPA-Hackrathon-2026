@@ -21,15 +21,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { getIncidentById } from "@/lib/mockData";
 import { useTranslation } from "@/lib/LanguageContext";
+import { useAppState } from "@/lib/AppStateContext";
 
 export default function IncidentDetailPage() {
   const params = useParams<{ caseId: string }>();
-  const incident = getIncidentById(decodeURIComponent(params.caseId));
-
-  // Action Flow B — เคสที่เคยขอขยายเวลาแล้วให้เริ่มที่สถานะรอ สคส. ทันที
-  const [gracePending, setGracePending] = useState(incident?.status === "grace_requested");
+  // Action Flow B — สถานะขอขยายเวลาอยู่ใน store กลาง หน้าอื่นจึงเห็นผลทันที
+  const { incident: activeIncident, gracePending, requestGracePeriod } = useAppState();
+  const caseId = decodeURIComponent(params.caseId);
+  const incident = activeIncident?.caseId === caseId ? activeIncident : undefined;
   const [isGraceOpen, setIsGraceOpen] = useState(false);
   const [isReportOpen, setIsReportOpen] = useState(false);
   const { t } = useTranslation();
@@ -143,7 +143,13 @@ export default function IncidentDetailPage() {
               </DialogTitle>
               <DialogDescription className="text-xs pt-1">{t("graceSub")}</DialogDescription>
             </DialogHeader>
-            <GracePeriodActivator sent={gracePending} onSent={() => { setGracePending(true); setIsGraceOpen(false); }} />
+            <GracePeriodActivator
+              sent={gracePending}
+              onSent={(rationaleKey, note) => {
+                requestGracePeriod(rationaleKey, note);
+                setIsGraceOpen(false);
+              }}
+            />
           </DialogContent>
         </Dialog>
       </main>

@@ -5,11 +5,17 @@ import { ArrowLeft, Siren } from "lucide-react";
 import { AppShell } from "@/components/layout/app-shell";
 import { IncidentList } from "@/components/crisis/incident-list";
 import { Button } from "@/components/ui/button";
-import { incidents } from "@/lib/mockData";
 import { useTranslation } from "@/lib/LanguageContext";
+import { useAppState } from "@/lib/AppStateContext";
 
 export default function CrisisRoomListPage() {
   const { t } = useTranslation();
+  // เหตุที่ยังไม่ปิดเท่านั้น — ปิดคดีแล้วรายการจะหายไปเองทุกหน้า
+  const { incident, gracePending } = useAppState();
+  // สถานะในตารางต้องสะท้อน action ที่เพิ่งทำในหน้ารายละเอียด ไม่ใช่ค่าตั้งต้น
+  const incidents = incident
+    ? [{ ...incident, status: gracePending ? ("grace_requested" as const) : incident.status }]
+    : [];
 
   return (
     <AppShell alertActive guardEnabled={false}>
