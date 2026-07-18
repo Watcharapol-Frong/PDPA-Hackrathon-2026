@@ -63,13 +63,16 @@ export function ExemptionQueue({ queue, onApprove, onReject }: ExemptionQueuePro
   const bulkReasonOptions = tArray("bulkReasonOptions");
 
   /**
-   * ความเสี่ยงมาจากตัวเหตุ ไม่ใช่จากการที่ DPO กดปุ่ม
-   * ยิ่ง Mitigation Factor (M) สูง = มาตรการป้องกันได้ผลมาก = ความเสี่ยงคงเหลือยิ่งต่ำ
+   * ป้ายต้องแสดง "ความเสี่ยงคงเหลือ" ซึ่งก็คือ legal state โดยตรง
+   *
+   * ห้ามเอา Mitigation Factor มาดันป้ายขึ้นเป็น Medium เพราะ State 1b แปลว่า
+   * "มาตรการทำงานจนไม่เหลือความเสี่ยงต่อเจ้าของข้อมูลแล้ว" — ติดป้าย Medium
+   * จะขัดกับข้อสรุปทางกฎหมายของตัวเอง ค่า M ไปแสดงในคอลัมน์มาตรการแทน
    */
   const getRiskLevel = (c: ExemptionCase): "High" | "Medium" | "Low" => {
     if (c.legalState === "3") return "High";
     if (c.legalState === "2") return "Medium";
-    return c.mitigationFactor >= 10 ? "Low" : "Medium";
+    return "Low";
   };
 
   // Filtering Logic (Risk Level only)
@@ -146,19 +149,19 @@ export function ExemptionQueue({ queue, onApprove, onReject }: ExemptionQueuePro
       case "High":
         return (
           <Badge className="bg-red-500/10 text-red-700 hover:bg-red-500/10 border border-red-200/20 font-bold text-[9px] rounded-md h-4.5 px-1.5 leading-none shrink-0 shadow-none">
-            {isEn ? "High" : "เสี่ยงสูง"}
+            {isEn ? "High Risk" : "เสี่ยงสูง"}
           </Badge>
         );
       case "Medium":
         return (
           <Badge className="bg-amber-500/10 text-amber-700 hover:bg-amber-500/10 border border-amber-200/20 font-bold text-[9px] rounded-md h-4.5 px-1.5 leading-none shrink-0 shadow-none">
-            {isEn ? "Medium" : "ปานกลาง"}
+            {isEn ? "Risk Present" : "มีความเสี่ยง"}
           </Badge>
         );
       case "Low":
         return (
           <Badge className="bg-slate-500/10 text-slate-600 hover:bg-slate-500/10 border border-slate-200/20 font-bold text-[9px] rounded-md h-4.5 px-1.5 leading-none shrink-0 shadow-none">
-            {isEn ? "Low" : "เสี่ยงต่ำ"}
+            {isEn ? "Exempt" : "เข้าข่ายยกเว้น"}
           </Badge>
         );
     }
@@ -188,7 +191,7 @@ export function ExemptionQueue({ queue, onApprove, onReject }: ExemptionQueuePro
             <div className="flex items-center gap-2">
               <span className="text-[9px] text-muted-foreground font-bold uppercase tracking-wider flex items-center gap-1 shrink-0">
                 <AlertTriangle className="size-3 text-amber-500" />
-                {isEn ? "Risk Level:" : "ความเสี่ยง:"}
+                {isEn ? "Legal State:" : "สถานะกฎหมาย:"}
               </span>
               <Select value={riskFilter} onValueChange={(val) => setRiskFilter(val as FilterRisk)}>
                 <SelectTrigger className="w-[125px] h-7 text-[10px] font-bold rounded-lg px-2 shadow-none bg-card">
@@ -242,7 +245,7 @@ export function ExemptionQueue({ queue, onApprove, onReject }: ExemptionQueuePro
                     <Checkbox checked={allSelected} onCheckedChange={toggleAll} aria-label={t("tableSelectAll")} />
                   </TableHead>
                   <TableHead className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80 sticky top-0 bg-card z-10">{t("tableCaseId")}</TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80 sticky top-0 bg-card z-10">{isEn ? "Risk" : "ความเสี่ยง"}</TableHead>
+                  <TableHead className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80 sticky top-0 bg-card z-10">{isEn ? "Legal State" : "สถานะกฎหมาย"}</TableHead>
                   <TableHead className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80 sticky top-0 bg-card z-10">{t("tableDetectedAt")}</TableHead>
                   <TableHead className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80 sticky top-0 bg-card z-10">{t("tableFields")}</TableHead>
                   <TableHead className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80 sticky top-0 bg-card z-10">{t("tableMitigation")}</TableHead>

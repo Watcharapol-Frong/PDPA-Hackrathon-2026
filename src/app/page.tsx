@@ -8,6 +8,7 @@ import { KpiCard } from "@/components/dashboard/kpi-card";
 import { RiskTelemetryChart } from "@/components/dashboard/risk-telemetry-chart";
 import { ExemptionQueue } from "@/components/dashboard/exemption-queue";
 import { PolicyCenter } from "@/components/dashboard/policy-center";
+import { ActionRequiredBanner } from "@/components/dashboard/action-required-banner";
 import { kpiCards } from "@/lib/mockData";
 import { useTranslation } from "@/lib/LanguageContext";
 import { useAppState } from "@/lib/AppStateContext";
@@ -78,8 +79,8 @@ export default function DashboardPage() {
                 <span>🚨</span>
                 <span>
                   {language === "en" 
-                    ? "CRITICAL THREAT ALERT: Active cross-tenant Botnet campaign detected by PDPC (สคส.). Enabling Traffic Throttling is highly recommended to mitigate exposure of PII."
-                    : "แจ้งเตือนภัยคุกคามความเสี่ยงสูง (Critical Threat Alert): สคส. ตรวจพบแคมเปญโจมตีภายนอกประเทศเจาะระบบหลายองค์กร แนะนำเปิดเกราะจำกัดความเร็วเชื่อมต่อ (Traffic Throttling) ทันทีเพื่อความปลอดภัย"}
+                    ? `CRITICAL BREACH WARNING: Active High-Risk Leak [${incident.caseId}] detected. Over ${incident.affectedRows.toLocaleString()} records exposed. DPO Action required immediately. Activate recommended safeguards.`
+                    : `แจ้งเตือนเหตุข้อมูลรั่วไหลระดับสูง (High-Risk Breach Alert): ตรวจพบการละเมิดข้อมูลลูกค้าระดับวิกฤต [${incident.caseId}] ผลกระทบ ${incident.affectedRows.toLocaleString()} รายชื่อ โปรดดำเนินการควบคุมเหตุทันที`}
                 </span>
                 <span className="opacity-40">|</span>
               </span>
@@ -88,6 +89,9 @@ export default function DashboardPage() {
         </div>
       )}
       <main className="flex-1 p-4 sm:p-6 space-y-4 sm:space-y-6 max-w-[1400px] w-full mx-auto">
+
+          {/* Action Required — เห็นจากหน้าแรกว่ามีคดีค้างและเหลือเวลาเท่าไหร่ (Design Spec 5.2) */}
+          <ActionRequiredBanner />
 
           {/* Section 1 — Status Layer */}
           <section className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4">

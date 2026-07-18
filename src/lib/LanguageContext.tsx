@@ -375,6 +375,15 @@ const translations = {
     piiEscalatedField: "Escalated PII field",
     timelineEscalated: "DPO rejected the exemption — case escalated for reporting",
     aiSummaryEscalated: "Escalated by DPO judgement rather than automated scoring. Pipeline B found no cross-tenant campaign match for this case.",
+    actionRequiredTitle: "Action required — reportable incidents open",
+    actionRequiredOne: "1 case must be reported to สคส. within the legal timeframe",
+    actionRequiredMany: "{count} cases must be reported to สคส. within the legal timeframe",
+    actionRequiredOpen: "Open case",
+    actionRequiredRemaining: "time left",
+    actionRequiredNotifyBoth: "Notify สคส. + data subjects",
+    actionRequiredNotifyPdpc: "Notify สคส.",
+    actionRequiredGraceHeld: "Extension requested — awaiting สคส.",
+    escalatedViewIncident: "View escalated incident",
   },
   th: {
     // Topbar
@@ -739,6 +748,15 @@ const translations = {
     piiEscalatedField: "ฟิลด์ข้อมูลที่ถูกยกระดับ",
     timelineEscalated: "DPO ตีกลับข้อยกเว้น — ยกระดับเคสเพื่อรายงาน",
     aiSummaryEscalated: "ยกระดับด้วยดุลพินิจของ DPO ไม่ใช่จากคะแนนอัตโนมัติ Pipeline B ไม่พบความเชื่อมโยงกับแคมเปญข้ามองค์กรสำหรับเคสนี้",
+    actionRequiredTitle: "ต้องดำเนินการ — มีเหตุที่ต้องรายงานค้างอยู่",
+    actionRequiredOne: "มี 1 เคสที่ต้องรายงาน สคส. ภายในกรอบเวลากฎหมาย",
+    actionRequiredMany: "มี {count} เคสที่ต้องรายงาน สคส. ภายในกรอบเวลากฎหมาย",
+    actionRequiredOpen: "เปิดเคส",
+    actionRequiredRemaining: "เวลาที่เหลือ",
+    actionRequiredNotifyBoth: "ต้องแจ้ง สคส. + เจ้าของข้อมูล",
+    actionRequiredNotifyPdpc: "ต้องแจ้ง สคส.",
+    actionRequiredGraceHeld: "ขอขยายเวลาแล้ว — รอ สคส. พิจารณา",
+    escalatedViewIncident: "ดูเคสที่ถูกยกระดับ",
   },
 };
 
