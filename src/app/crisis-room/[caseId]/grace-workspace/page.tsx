@@ -27,6 +27,7 @@ import { useTranslation, type TranslationKey } from "@/lib/LanguageContext";
 import { useAppState } from "@/lib/AppStateContext";
 import { cn } from "@/lib/utils";
 import type * as React from "react";
+import { AiDocumentAssistant } from "@/components/crisis/ai-document-assistant";
 
 const Input = ({ className, ...props }: React.ComponentProps<"input">) => (
   <input
@@ -462,6 +463,18 @@ export default function GraceWorkspacePage() {
             </Button>
           </DialogContent>
         </Dialog>
+
+        {/* AI Document Assistant */}
+        <AiDocumentAssistant
+          mode="grace-period"
+          incidentTitle={incident.titleKey}
+          affectedCount={incident.affectedRows.toLocaleString(locale)}
+          detectedAt={incident.detectedAt}
+          onInsert={(field, value) => {
+            if (field === "circumstance") setCircumstance(value);
+            if (field === "additionalContext") setAdditionalContext(value);
+          }}
+        />
       </main>
     </AppShell>
   );

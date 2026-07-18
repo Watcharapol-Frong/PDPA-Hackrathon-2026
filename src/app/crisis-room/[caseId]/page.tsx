@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { AlertCircle, ArrowLeft, Siren, Clock, FileText } from "lucide-react";
@@ -9,29 +8,18 @@ import { CountdownTimer } from "@/components/crisis/countdown-timer";
 import { BlastRadius } from "@/components/crisis/blast-radius";
 import { AttackTimeline } from "@/components/crisis/attack-timeline";
 import { AttackVectorGraph } from "@/components/crisis/attack-vector-graph";
-import { GracePeriodActivator } from "@/components/crisis/grace-period-activator";
-import { ReportDraft } from "@/components/crisis/report-draft";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { useTranslation } from "@/lib/LanguageContext";
 import { useAppState } from "@/lib/AppStateContext";
 
 export default function IncidentDetailPage() {
   const params = useParams<{ caseId: string }>();
   // Action Flow B — สถานะขอขยายเวลาอยู่ใน store กลาง หน้าอื่นจึงเห็นผลทันที
-  const { incident: activeIncident, gracePending, requestGracePeriod } = useAppState();
+  const { incident: activeIncident, gracePending } = useAppState();
   const caseId = decodeURIComponent(params.caseId);
   const incident = activeIncident?.caseId === caseId ? activeIncident : undefined;
-  const [isGraceOpen, setIsGraceOpen] = useState(false);
-  const [isReportOpen, setIsReportOpen] = useState(false);
   const { t } = useTranslation();
 
   if (!incident) {
@@ -115,12 +103,14 @@ export default function IncidentDetailPage() {
         {/* Section 3 — Phased Actions Panel */}
         <div className="flex flex-col sm:flex-row items-center justify-end gap-3 pt-5 border-t">
           <Button
+            asChild
             variant="outline"
-            onClick={() => setIsGraceOpen(true)}
             className="w-full sm:w-auto h-9 px-4 text-xs font-bold rounded-xl cursor-pointer flex items-center gap-1.5"
           >
-            <Clock className="size-3.5 text-amber-500" />
-            <span>{t("btnRequestGrace")}</span>
+            <Link href={`/crisis-room/${encodeURIComponent(incident.caseId)}/grace-workspace`}>
+              <Clock className="size-3.5 text-amber-500" />
+              <span>{gracePending ? t("graceAlreadySent") : t("btnRequestGrace")}</span>
+            </Link>
           </Button>
           <Button
             asChild
@@ -132,26 +122,6 @@ export default function IncidentDetailPage() {
             </Link>
           </Button>
         </div>
-
-        {/* Dialog for Grace Period Activation */}
-        <Dialog open={isGraceOpen} onOpenChange={setIsGraceOpen}>
-          <DialogContent className="sm:max-w-lg border-t-4 border-t-amber-500 max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <Clock className="size-5 text-amber-500 shrink-0" />
-                {t("graceTitle")}
-              </DialogTitle>
-              <DialogDescription className="text-xs pt-1">{t("graceSub")}</DialogDescription>
-            </DialogHeader>
-            <GracePeriodActivator
-              sent={gracePending}
-              onSent={(rationaleKey, note) => {
-                requestGracePeriod(rationaleKey, note);
-                setIsGraceOpen(false);
-              }}
-            />
-          </DialogContent>
-        </Dialog>
       </main>
     </AppShell>
   );

@@ -1,6 +1,14 @@
 "use client";
 
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import type { ExemptionCase, IncidentData, PolicyState } from "./types";
 import type { TranslationKey } from "./LanguageContext";
 
@@ -47,10 +55,8 @@ function nowStamp() {
   return new Date().toISOString().slice(0, 19).replace("T", " ");
 }
 
-let seq = 0;
-function nextId() {
-  seq += 1;
-  return `LOG-${String(seq).padStart(4, "0")}`;
+function formatId(n: number) {
+  return `LOG-${String(n).padStart(4, "0")}`;
 }
 
 interface AppStateProviderProps {
@@ -76,8 +82,14 @@ export function AppStateProvider({
   const [exemptionQueue, setExemptionQueue] = useState<ExemptionCase[]>(initialExemptions);
   const [auditLog, setAuditLog] = useState<AuditEntry[]>(initialAuditLog);
 
+  // นับต่อจากบันทึกตั้งต้น ไม่งั้น id จะชนกับ seed (LOG-0001/0002) แล้ว React ฟ้อง key ซ้ำ
+  const seqRef = useRef(initialAuditLog.length);
+
   const appendLog = useCallback((entry: Omit<AuditEntry, "id" | "timestamp">) => {
-    setAuditLog((log) => [{ ...entry, id: nextId(), timestamp: nowStamp() }, ...log]);
+    // สร้าง id/เวลานอก updater — ไม่งั้น StrictMode จะเรียกซ้ำและกิน id เปล่า
+    seqRef.current += 1;
+    const sealed: AuditEntry = { ...entry, id: formatId(seqRef.current), timestamp: nowStamp() };
+    setAuditLog((log) => [sealed, ...log]);
   }, []);
 
   const requestGracePeriod = useCallback(
@@ -97,28 +109,26 @@ export function AppStateProvider({
 
   const updatePolicy = useCallback(
     (next: PolicyState) => {
-      setPolicy((prev) => {
-        // บันทึกเฉพาะ guard ที่เปลี่ยนสถานะจริง
-        (Object.keys(next) as (keyof PolicyState)[]).forEach((key) => {
-          if (prev[key] !== next[key]) {
-            appendLog({
-              actorKey: "auditActorDpo",
-              actionKey:
-                key === "dataMasking"
-                  ? next[key]
-                    ? "auditActionMaskingOn"
-                    : "auditActionMaskingOff"
-                  : next[key]
-                    ? "auditActionThrottleOn"
-                    : "auditActionThrottleOff",
-              category: "policy",
-            });
-          }
+      // คำนวณ diff นอก updater — ห้ามเขียน log ในนั้น เพราะ React เรียก updater ซ้ำได้
+      // (StrictMode ทำให้บันทึกซ้ำ 2 บรรทัดต่อการกดหนึ่งครั้ง)
+      (Object.keys(next) as (keyof PolicyState)[]).forEach((key) => {
+        if (policy[key] === next[key]) return;
+        appendLog({
+          actorKey: "auditActorDpo",
+          actionKey:
+            key === "dataMasking"
+              ? next[key]
+                ? "auditActionMaskingOn"
+                : "auditActionMaskingOff"
+              : next[key]
+                ? "auditActionThrottleOn"
+                : "auditActionThrottleOff",
+          category: "policy",
         });
-        return next;
       });
+      setPolicy(next);
     },
-    [appendLog],
+    [appendLog, policy],
   );
 
   const approveExemptions = useCallback(

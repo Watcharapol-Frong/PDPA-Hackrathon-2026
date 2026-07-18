@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { AlertOctagon, ArrowRight, Database, MousePointerClick } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -145,9 +146,11 @@ export function BlastRadius({ caseId, detectedAt, severity, affectedRows, fields
 
                 {/* Progressive Disclosure Level 3 — ข้ามไปหน้าหลักฐาน */}
                 <div className="text-right">
-                  <Button variant="link" size="sm" className="text-xs">
-                    {t("schemaAuditLink")}
-                    <ArrowRight className="size-3.5" />
+                  <Button asChild variant="link" size="sm" className="text-xs">
+                    <Link href={`/audit-log?case=${encodeURIComponent(caseId)}`}>
+                      {t("schemaAuditLink")}
+                      <ArrowRight className="size-3.5" />
+                    </Link>
                   </Button>
                 </div>
               </div>

@@ -15,6 +15,7 @@ import { getIncidentById } from "@/lib/mockData";
 import { useTranslation } from "@/lib/LanguageContext";
 import { cn } from "@/lib/utils";
 import type * as React from "react";
+import { AiDocumentAssistant } from "@/components/crisis/ai-document-assistant";
 
 const Input = ({ className, ...props }: React.ComponentProps<"input">) => (
   <input
@@ -367,6 +368,18 @@ export default function DocumentWorkspacePage() {
             </div>
           </DialogContent>
         </Dialog>
+
+        {/* AI Document Assistant */}
+        <AiDocumentAssistant
+          mode="breach-report"
+          incidentTitle={incident.titleKey}
+          affectedCount={affectedCount}
+          detectedAt={incident.detectedAt}
+          onInsert={(field, value) => {
+            if (field === "containmentDetails") setContainmentDetails(value);
+            if (field === "additionalNotes") setAdditionalNotes(value);
+          }}
+        />
       </main>
     </AppShell>
   );
