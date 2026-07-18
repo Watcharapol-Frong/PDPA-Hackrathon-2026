@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/table";
 import { LiveCountdown } from "./live-countdown";
 import { useTranslation } from "@/lib/LanguageContext";
+import { useAppState } from "@/lib/AppStateContext";
 import type { IncidentData, IncidentSeverity, IncidentStatus } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -46,6 +47,7 @@ const statusMeta: Record<
 export function IncidentList({ incidents }: { incidents: IncidentData[] }) {
   const { t, language } = useTranslation();
   const router = useRouter();
+  const { isNewCase, markCaseViewed } = useAppState();
 
   // Triage Logic ตาม spec — เคสที่เหลือเวลาน้อยที่สุดอยู่บนสุดเสมอ
   const sorted = [...incidents].sort((a, b) => a.remainingSeconds - b.remainingSeconds);
@@ -118,26 +120,42 @@ export function IncidentList({ incidents }: { incidents: IncidentData[] }) {
                   const st = statusMeta[inc.status];
                   const href = `/crisis-room/${inc.caseId}`;
                   const isMostUrgent = i === 0;
+                  const isNew = isNewCase(inc.caseId);
+                  const open = () => {
+                    markCaseViewed(inc.caseId);
+                    router.push(href);
+                  };
 
                   return (
                     <TableRow
                       key={inc.caseId}
-                      onClick={() => router.push(href)}
+                      onClick={open}
                       tabIndex={0}
                       aria-label={`${t("incidentOpenAction")} ${inc.caseId}`}
                       onKeyDown={(e) => {
                         if (e.key === "Enter" || e.key === " ") {
                           e.preventDefault();
-                          router.push(href);
+                          open();
                         }
                       }}
                       className={cn(
                         "cursor-pointer focus-visible:outline-2 focus-visible:outline-destructive",
                         isMostUrgent && "bg-destructive/5 hover:bg-destructive/10",
+                        isNew && "border-l-2 border-l-primary",
                       )}
                     >
                       <TableCell className="pl-4 max-w-[260px] align-top py-3">
-                        <div className="font-mono text-xs font-semibold">{inc.caseId}</div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-mono text-xs font-semibold">{inc.caseId}</span>
+                          {isNew && (
+                            <Badge
+                              aria-label={t("caseNewAria")}
+                              className="bg-primary text-primary-foreground hover:bg-primary text-[9px] font-bold h-4 py-0 px-1 animate-pulse"
+                            >
+                              {t("caseNewBadge")}
+                            </Badge>
+                          )}
+                        </div>
                         <div className="text-[11px] text-muted-foreground leading-snug mt-0.5">
                           {t(inc.titleKey)}
                         </div>

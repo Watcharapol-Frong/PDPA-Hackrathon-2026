@@ -74,6 +74,13 @@ export function Topbar({
         </div>
       </div>
 
+      {/* Centered DEMO Indicator */}
+      <div className="hidden md:flex items-center justify-center">
+        <span className="bg-amber-500/10 text-amber-600 dark:text-amber-500 border border-amber-500/20 px-3 py-1 rounded-full font-mono text-[10px] font-extrabold uppercase tracking-widest animate-pulse">
+          {language === "en" ? "⚠️ DEMO ONLY — Simulated Environment" : "⚠️ ระบบจำลอง — ชุดข้อมูลทดสอบเท่านั้น"}
+        </span>
+      </div>
+
       <div className="flex items-center gap-1 sm:gap-4 shrink-0">
         <span className="hidden xl:flex items-center gap-1.5 text-xs text-muted-foreground font-mono">
           <span className="w-1.5 h-1.5 rounded-full bg-brand-success animate-pulse" />

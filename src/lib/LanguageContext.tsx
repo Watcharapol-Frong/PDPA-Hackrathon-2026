@@ -384,6 +384,9 @@ const translations = {
     actionRequiredNotifyPdpc: "Notify สคส.",
     actionRequiredGraceHeld: "Extension requested — awaiting สคส.",
     escalatedViewIncident: "View escalated incident",
+    caseNewBadge: "NEW",
+    caseNewAria: "New case — not yet opened by the DPO",
+    caseNewCount: "{count} new",
   },
   th: {
     // Topbar
@@ -757,6 +760,9 @@ const translations = {
     actionRequiredNotifyPdpc: "ต้องแจ้ง สคส.",
     actionRequiredGraceHeld: "ขอขยายเวลาแล้ว — รอ สคส. พิจารณา",
     escalatedViewIncident: "ดูเคสที่ถูกยกระดับ",
+    caseNewBadge: "ใหม่",
+    caseNewAria: "เคสใหม่ — DPO ยังไม่เคยเปิดดู",
+    caseNewCount: "ใหม่ {count}",
   },
 };
 

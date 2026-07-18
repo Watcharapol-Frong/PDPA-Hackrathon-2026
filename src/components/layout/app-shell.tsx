@@ -32,7 +32,18 @@ export function AppShell({
           guardEnabled={guardEnabled}
           onQuickAction={onQuickAction}
         />
-        {children}
+        <div className="flex-1 flex flex-col overflow-y-auto">
+          {children}
+        </div>
+        
+        {/* Global Demo Disclaimer Footer */}
+        <footer className="border-t bg-card/60 py-2.5 px-4 text-center shrink-0">
+          <p className="text-[9px] text-muted-foreground/80 leading-relaxed font-medium">
+            Disclaimer: This application is a simulated demonstration portal using generated mock data for PDPA hackathon evaluation only. No real customer data is processed.
+            <br />
+            หมายเหตุ: ระบบนี้พัฒนาขึ้นเพื่อจำลองการสาธิตและทดสอบเกณฑ์ทางกฎหมายคุ้มครองข้อมูลส่วนบุคคล (PDPA) เท่านั้น ข้อมูลทั้งหมดเป็นชุดข้อมูลทดสอบจำลอง
+          </p>
+        </footer>
       </div>
     </div>
   );

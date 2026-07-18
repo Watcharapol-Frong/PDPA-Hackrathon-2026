@@ -38,6 +38,8 @@ interface NavLinkProps {
   isOpen?: boolean;
   /** แสดงจุดแดงเตือนเมื่อมีเหตุวิกฤตค้างอยู่ */
   alert?: boolean;
+  /** จำนวนเคสใหม่ที่ยังไม่เคยเปิด — 0 = ไม่แสดง */
+  badgeCount?: number;
 }
 
 export function NavLink({
@@ -49,6 +51,7 @@ export function NavLink({
   onClick,
   isOpen = true,
   alert = false,
+  badgeCount = 0,
 }: NavLinkProps) {
   return (
     <Link
@@ -73,8 +76,15 @@ export function NavLink({
         )}
       </span>
       {isOpen && (
-        <span className="min-w-0">
-          <span className="block text-sm font-semibold leading-tight">{label}</span>
+        <span className="min-w-0 flex-1">
+          <span className="flex items-center gap-1.5 text-sm font-semibold leading-tight">
+            {label}
+            {badgeCount > 0 && (
+              <span className="shrink-0 rounded-full bg-primary text-primary-foreground text-[9px] font-bold px-1.5 py-0.5 leading-none">
+                {badgeCount}
+              </span>
+            )}
+          </span>
           <span
             className={cn(
               "block text-[10px] font-mono mt-0.5",
@@ -99,7 +109,7 @@ export function SidebarNavContent({
   const { t } = useTranslation();
   const pathname = usePathname();
   // จุดแดงเตือนขึ้นเฉพาะตอนมีเหตุค้างจริง ปิดคดีแล้วต้องหายไป
-  const { incident } = useAppState();
+  const { incident, newCaseCount } = useAppState();
 
   return (
     <div className="flex flex-col h-full w-full">
@@ -115,6 +125,7 @@ export function SidebarNavContent({
             onClick={onNavigate}
             isOpen={isOpen}
             alert={item.id === "incident" && incident !== null}
+            badgeCount={item.id === "incident" ? newCaseCount : 0}
           />
         ))}
       </nav>

@@ -47,6 +47,11 @@ interface AppStateValue {
   gracePendingIds: string[];
   isGracePending: (caseId: string) => boolean;
 
+  /** เคสที่ DPO ยังไม่เคยเปิดดู — ใช้ขึ้นป้าย NEW */
+  isNewCase: (caseId: string) => boolean;
+  newCaseCount: number;
+  markCaseViewed: (caseId: string) => void;
+
   /** เอกสารที่ยื่นแล้วของแต่ละเคส */
   documentsFor: (caseId: string) => IncidentDocuments;
   /** State 3 ต้องครบทั้ง 2 ฉบับ / State 2 ต้องมีรายงาน สคส. */
@@ -97,6 +102,10 @@ export function AppStateProvider({
     initialIncidents.filter((i) => i.status === "grace_requested").map((i) => i.caseId),
   );
   const [documents, setDocuments] = useState<Record<string, IncidentDocuments>>({});
+  // เคสที่สถานะยังเป็น awaiting_review คือเคสที่เพิ่งเข้ามาและ DPO ยังไม่เคยเปิด
+  const [viewedCaseIds, setViewedCaseIds] = useState<string[]>(() =>
+    initialIncidents.filter((i) => i.status !== "awaiting_review").map((i) => i.caseId),
+  );
   const [policy, setPolicy] = useState<PolicyState>({
     dataMasking: true,
     trafficThrottling: false,
@@ -124,6 +133,15 @@ export function AppStateProvider({
     (caseId: string) => gracePendingIds.includes(caseId),
     [gracePendingIds],
   );
+
+  const isNewCase = useCallback(
+    (caseId: string) => !viewedCaseIds.includes(caseId),
+    [viewedCaseIds],
+  );
+
+  const markCaseViewed = useCallback((caseId: string) => {
+    setViewedCaseIds((ids) => (ids.includes(caseId) ? ids : [...ids, caseId]));
+  }, []);
 
   const documentsFor = useCallback(
     (caseId: string): IncidentDocuments =>
@@ -296,6 +314,11 @@ export function AppStateProvider({
     [incidents],
   );
 
+  const newCaseCount = useMemo(
+    () => incidents.filter((i) => !viewedCaseIds.includes(i.caseId)).length,
+    [incidents, viewedCaseIds],
+  );
+
   const legalState: LegalState = useMemo(() => {
     if (incidents.some((i) => i.severity === "high_risk")) return "3";
     if (incidents.length > 0) return "2";
@@ -311,6 +334,9 @@ export function AppStateProvider({
       getIncident,
       gracePendingIds,
       isGracePending,
+      isNewCase,
+      newCaseCount,
+      markCaseViewed,
       documentsFor,
       canCloseCase,
       policy,
@@ -329,6 +355,9 @@ export function AppStateProvider({
       getIncident,
       gracePendingIds,
       isGracePending,
+      isNewCase,
+      newCaseCount,
+      markCaseViewed,
       documentsFor,
       canCloseCase,
       policy,

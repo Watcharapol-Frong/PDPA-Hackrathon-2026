@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
  * จะเห็นจากหน้าแรกว่ามีคดีค้างและเหลือเวลาเท่าไหร่
  */
 export function ActionRequiredBanner() {
-  const { incidents, isGracePending } = useAppState();
+  const { incidents, isGracePending, isNewCase, markCaseViewed } = useAppState();
   const { t } = useTranslation();
 
   if (incidents.length === 0) return null;
@@ -65,14 +65,26 @@ export function ActionRequiredBanner() {
         {incidents.map((inc) => {
           const high = inc.severity === "high_risk";
           const held = isGracePending(inc.caseId);
+          const isNew = isNewCase(inc.caseId);
           return (
             <li
               key={inc.caseId}
-              className="flex flex-col gap-2 px-4 py-2.5 sm:flex-row sm:items-center sm:gap-4"
+              className={cn(
+                "flex flex-col gap-2 px-4 py-2.5 sm:flex-row sm:items-center sm:gap-4",
+                isNew && "bg-primary/5 border-l-2 border-l-primary",
+              )}
             >
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="font-mono text-xs font-bold">{inc.caseId}</span>
+                  {isNew && (
+                    <Badge
+                      aria-label={t("caseNewAria")}
+                      className="bg-primary text-primary-foreground hover:bg-primary text-[9px] font-bold h-4.5 py-0 px-1.5 animate-pulse"
+                    >
+                      {t("caseNewBadge")}
+                    </Badge>
+                  )}
                   <Badge
                     className={cn(
                       "text-[9px] font-bold h-4.5 py-0 px-1.5",
@@ -104,7 +116,10 @@ export function ActionRequiredBanner() {
                   />
                 </div>
                 <Button asChild size="sm" variant={high ? "default" : "outline"} className="text-xs h-8">
-                  <Link href={`/crisis-room/${encodeURIComponent(inc.caseId)}`}>
+                  <Link
+                    href={`/crisis-room/${encodeURIComponent(inc.caseId)}`}
+                    onClick={() => markCaseViewed(inc.caseId)}
+                  >
                     {t("actionRequiredOpen")}
                     <ArrowRight className="size-3.5" />
                   </Link>

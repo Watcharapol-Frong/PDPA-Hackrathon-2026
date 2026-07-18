@@ -50,44 +50,12 @@ export default function DashboardPage() {
     ...kpiCards[2],
     value: String(queue.filter((c) => c.status === "Pending").length),
   };
-
-  // แถบวิ่งสีแดงขึ้นเมื่อ "มีเหตุวิกฤตค้างอยู่จริง" และยังไม่เปิดเกราะที่ สคส. แนะนำ
-  const hasActiveThreat = incident !== null && !policy.trafficThrottling;
-
   return (
     <AppShell
       alertActive
       guardEnabled={policy.trafficThrottling}
       onQuickAction={handleQuickAction}
     >
-      {hasActiveThreat && (
-        <div className="w-full bg-red-600 text-white overflow-hidden py-1.5 text-xs font-bold select-none flex items-center border-b border-red-700 relative z-20 shadow-sm">
-          <style>{`
-            @keyframes marquee-scroll {
-              0% { transform: translateX(0); }
-              100% { transform: translateX(-33.33%); }
-            }
-            .animate-marquee-scroll {
-              display: flex;
-              width: max-content;
-              animation: marquee-scroll 25s linear infinite;
-            }
-          `}</style>
-          <div className="animate-marquee-scroll flex gap-8">
-            {[1, 2, 3].map((i) => (
-              <span key={i} className="whitespace-nowrap flex items-center gap-2">
-                <span>🚨</span>
-                <span>
-                  {language === "en" 
-                    ? `CRITICAL BREACH WARNING: Active High-Risk Leak [${incident.caseId}] detected. Over ${incident.affectedRows.toLocaleString()} records exposed. DPO Action required immediately. Activate recommended safeguards.`
-                    : `แจ้งเตือนเหตุข้อมูลรั่วไหลระดับสูง (High-Risk Breach Alert): ตรวจพบการละเมิดข้อมูลลูกค้าระดับวิกฤต [${incident.caseId}] ผลกระทบ ${incident.affectedRows.toLocaleString()} รายชื่อ โปรดดำเนินการควบคุมเหตุทันที`}
-                </span>
-                <span className="opacity-40">|</span>
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
       <main className="flex-1 p-4 sm:p-6 space-y-4 sm:space-y-6 max-w-[1400px] w-full mx-auto">
 
           {/* Action Required — เห็นจากหน้าแรกว่ามีคดีค้างและเหลือเวลาเท่าไหร่ (Design Spec 5.2) */}
