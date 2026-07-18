@@ -1,65 +1,125 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useRef, useState } from "react";
+import { AppShell } from "@/components/layout/app-shell";
+import { GlobalHealthBox } from "@/components/dashboard/global-health-box";
+import { KpiCard } from "@/components/dashboard/kpi-card";
+import { RiskTelemetryChart } from "@/components/dashboard/risk-telemetry-chart";
+import { ExemptionQueue } from "@/components/dashboard/exemption-queue";
+import { PolicyCenter } from "@/components/dashboard/policy-center";
+import { exemptionQueue as initialQueue, kpiCards } from "@/lib/mockData";
+import type { ExemptionCase, PolicyState } from "@/lib/types";
+import { useTranslation } from "@/lib/LanguageContext";
+
+export default function DashboardPage() {
+  const { language } = useTranslation();
+  const [policy, setPolicy] = useState<PolicyState>({ dataMasking: false, trafficThrottling: false });
+  const [queue, setQueue] = useState<ExemptionCase[]>(initialQueue);
+  const [pendingGuard, setPendingGuard] = useState<"dataMasking" | "trafficThrottling" | null>(null);
+  const policyRef = useRef<HTMLDivElement>(null);
+
+  // Action Flow D — ปุ่มลัดจาก National Alert: เลื่อนจอไปที่ Policy Center แล้วเปิด Safety Gate ให้อัตโนมัติ
+  const handleQuickAction = () => {
+    policyRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    // reset ก่อนเสมอ เพื่อให้ setState ไม่ถูก React bail-out เมื่อ pendingGuard ค้างค่าเดิม
+    setPendingGuard(null);
+    setTimeout(() => setPendingGuard("trafficThrottling"), 450);
+  };
+
+  const handleApprove = (ids: string[]) => {
+    setQueue((q) =>
+      q.map((c) => (ids.includes(c.id) ? { ...c, status: "Approved" as const } : c))
+    );
+  };
+
+  const handleReject = (ids: string[]) => {
+    setQueue((q) =>
+      q.map((c) => (ids.includes(c.id) ? { ...c, status: "Rejected" as const } : c))
+    );
+  };
+
+  const pendingKpi = {
+    ...kpiCards[2],
+    value: String(queue.filter((c) => c.status === "Pending").length),
+  };
+
+  const hasActiveThreat = !policy.trafficThrottling;
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <AppShell
+      alertActive
+      guardEnabled={policy.trafficThrottling}
+      onQuickAction={handleQuickAction}
+    >
+      {hasActiveThreat && (
+        <div className="w-full bg-red-600 text-white overflow-hidden py-1.5 text-xs font-bold select-none flex items-center border-b border-red-700 relative z-20 shadow-sm">
+          <style>{`
+            @keyframes marquee-scroll {
+              0% { transform: translateX(0); }
+              100% { transform: translateX(-33.33%); }
+            }
+            .animate-marquee-scroll {
+              display: flex;
+              width: max-content;
+              animation: marquee-scroll 25s linear infinite;
+            }
+          `}</style>
+          <div className="animate-marquee-scroll flex gap-8">
+            {[1, 2, 3].map((i) => (
+              <span key={i} className="whitespace-nowrap flex items-center gap-2">
+                <span>🚨</span>
+                <span>
+                  {language === "en" 
+                    ? "CRITICAL THREAT ALERT: Active cross-tenant Botnet campaign detected by PDPC (สคส.). Enabling Traffic Throttling is highly recommended to mitigate exposure of PII."
+                    : "แจ้งเตือนภัยคุกคามความเสี่ยงสูง (Critical Threat Alert): สคส. ตรวจพบแคมเปญโจมตีภายนอกประเทศเจาะระบบหลายองค์กร แนะนำเปิดเกราะจำกัดความเร็วเชื่อมต่อ (Traffic Throttling) ทันทีเพื่อความปลอดภัย"}
+                </span>
+                <span className="opacity-40">|</span>
+              </span>
+            ))}
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+      )}
+      <main className="flex-1 p-4 sm:p-6 space-y-4 sm:space-y-6 max-w-[1400px] w-full mx-auto">
+
+          {/* Section 1 — Status Layer */}
+          <section className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4">
+            <div className="lg:col-span-4">
+              <GlobalHealthBox
+                policy={policy}
+                pendingCount={queue.filter((c) => c.status === "Pending").length}
+                hasActiveThreat={hasActiveThreat}
+              />
+            </div>
+            <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+              <KpiCard kpi={kpiCards[0]} />
+              <KpiCard kpi={kpiCards[1]} />
+              <KpiCard kpi={pendingKpi} />
+            </div>
+          </section>
+
+          {/* Section 2 — Exemption Request Queue */}
+          <section className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4">
+            <div className="lg:col-span-12">
+              <ExemptionQueue queue={queue} onApprove={handleApprove} onReject={handleReject} />
+            </div>
+          </section>
+
+          {/* Section 3 — Main Split Layout (Action Layer) */}
+          <section className="grid grid-cols-1 xl:grid-cols-12 gap-4 sm:gap-6">
+            <div className="xl:col-span-7">
+              <RiskTelemetryChart />
+            </div>
+            <div className="xl:col-span-5">
+              <PolicyCenter
+                ref={policyRef}
+                policy={policy}
+                onChange={setPolicy}
+                pendingGuard={pendingGuard}
+                onPendingConsumed={() => setPendingGuard(null)}
+              />
+            </div>
+          </section>
+        </main>
+      </AppShell>
   );
 }
