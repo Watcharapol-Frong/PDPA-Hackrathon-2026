@@ -449,7 +449,7 @@ export default function GraceWorkspacePage() {
               <DialogDescription className="leading-relaxed pt-1 text-xs">
                 {language === "th"
                   ? "คำร้องของท่านได้รับการลงชื่อและส่งไปยังระบบกลางของสำนักงานคณะกรรมการคุ้มครองข้อมูลส่วนบุคคล (สคส.) เรียบร้อยแล้ว นาฬิกานับถอยหลัง 72 ชั่วโมงได้หยุดพักชั่วคราวจนกว่า สคส. จะมีคำตัดสิน"
-                  : "Your request has been digitally signed and submitted to the PDPC (สคส.) central registry. The 72-hour legal countdown is now paused pending their review decision."}
+                  : "Your request has been digitally signed and submitted to the PDPC central registry. The 72-hour legal countdown is now paused pending their review decision."}
               </DialogDescription>
             </DialogHeader>
             <div className="bg-muted p-2 rounded-xl text-[10px] font-mono text-muted-foreground select-text border w-full text-center">

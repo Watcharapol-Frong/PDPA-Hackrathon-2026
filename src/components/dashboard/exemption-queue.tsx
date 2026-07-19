@@ -624,11 +624,9 @@ export function ExemptionQueue({ queue, onApprove, onReject }: ExemptionQueuePro
                     {isEn ? "Breach Escalation — Notification Required" : "ยกระดับเป็นการละเมิด — ต้องแจ้ง สคส."}
                   </span>
                 </DialogTitle>
-                <DialogDescription className="text-xs">
                   {isEn
-                    ? `Case ${detailCase.id} did not qualify for exemption. This breach must be formally reported to PDPC (สคส.) within the 72-hour legal window.`
+                    ? `Case ${detailCase.id} did not qualify for exemption. This breach must be formally reported to PDPC within the 72-hour legal window.`
                     : `เคส ${detailCase.id} ไม่ผ่านเกณฑ์ข้อยกเว้น ต้องแจ้งต่อ สคส. ภายใน 72 ชั่วโมง`}
-                </DialogDescription>
               </DialogHeader>
               <div className="space-y-4 pt-1">
                 <div className="flex items-center justify-between">
@@ -685,7 +683,7 @@ export function ExemptionQueue({ queue, onApprove, onReject }: ExemptionQueuePro
                   <div className="space-y-1.5">
                     {[
                       { en: "Open Crisis Management Room for this incident",                   th: "เปิดห้องจัดการวิกฤตสำหรับเหตุการณ์นี้" },
-                      { en: "Draft and file the breach notification report (สคส.)",           th: "ร่างและยื่นรายงานแจ้งเหตุละเมิดต่อ สคส." },
+                      { en: "Draft and file the breach notification report (PDPC)",           th: "ร่างและยื่นรายงานแจ้งเหตุละเมิดต่อ สคส." },
                       { en: "Notify affected data subjects if high-risk",                      th: "แจ้งเจ้าของข้อมูลที่ได้รับผลกระทบหากเสี่ยงสูง" },
                       { en: "Consider Emergency Grace Period Request if 72h is infeasible",   th: "พิจารณาคำร้องขอขยายเวลาฉุกเฉินหาก 72 ชม. ไม่เพียงพอ" },
                     ].map((item, i) => (

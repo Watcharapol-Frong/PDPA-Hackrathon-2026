@@ -382,7 +382,7 @@ export default function DocumentWorkspacePage() {
               <p className="text-xs text-muted-foreground leading-relaxed max-w-xs">
                 {language === "th"
                   ? "ร่างเอกสารรายงานได้ยื่นส่งระบบกลางของ สำนักงานคณะกรรมการคุ้มครองข้อมูลส่วนบุคคล (สคส.) สำเร็จแล้ว ข้อมูลการทำรายงานถูกบันทึกลงคลังพยานหลักฐานแบบย้อนกลับไม่ได้ (Immutable Log)"
-                  : "The official incident report draft has been digitally signed and submitted to the PDPC (สคส.) central API gateway registry. An immutable log entry has been written to the WORM telemetry system."}
+                  : "The official incident report draft has been digitally signed and submitted to the PDPC central API gateway registry. An immutable log entry has been written to the WORM telemetry system."}
               </p>
               <div className="bg-muted p-2 rounded-xl text-[10px] font-mono text-muted-foreground select-text border w-full">
                 Ticket ID: PDPC-ACK-REG-9812-2026

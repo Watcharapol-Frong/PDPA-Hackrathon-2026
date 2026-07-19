@@ -47,7 +47,7 @@ const statusMeta: Record<
 export function IncidentList({ incidents }: { incidents: IncidentData[] }) {
   const { t, language } = useTranslation();
   const router = useRouter();
-  const { isNewCase, markCaseViewed, isAwarenessConfirmed } = useAppState();
+  const { isNewCase, markCaseViewed, isAwarenessConfirmed, deadlineFor } = useAppState();
 
   // Triage Logic ตาม spec — เคสที่เหลือเวลาน้อยที่สุดอยู่บนสุดเสมอ
   const sorted = [...incidents].sort((a, b) => a.remainingSeconds - b.remainingSeconds);
@@ -205,6 +205,7 @@ export function IncidentList({ incidents }: { incidents: IncidentData[] }) {
                           startSeconds={inc.remainingSeconds}
                           paused={inc.status === "grace_requested"}
                           notStarted={notStarted}
+                          deadlineAt={deadlineFor(inc.caseId)}
                           className="text-sm"
                         />
                         {notStarted && (

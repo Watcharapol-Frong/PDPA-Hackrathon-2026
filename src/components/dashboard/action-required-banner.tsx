@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
  * จะเห็นจากหน้าแรกว่ามีคดีค้างและเหลือเวลาเท่าไหร่
  */
 export function ActionRequiredBanner() {
-  const { incidents, isGracePending, isNewCase, markCaseViewed, isAwarenessConfirmed } = useAppState();
+  const { incidents, isGracePending, isNewCase, markCaseViewed, isAwarenessConfirmed, deadlineFor } = useAppState();
   const { t } = useTranslation();
 
   if (incidents.length === 0) return null;
@@ -118,6 +118,7 @@ export function ActionRequiredBanner() {
                     startSeconds={inc.remainingSeconds}
                     paused={held}
                     notStarted={notStarted}
+                    deadlineAt={deadlineFor(inc.caseId)}
                     className="text-sm"
                   />
                 </div>

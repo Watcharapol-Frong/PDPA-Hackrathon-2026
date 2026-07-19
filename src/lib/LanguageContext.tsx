@@ -25,7 +25,7 @@ const translations = {
     openSidebar: "Open sidebar",
     userName: "Nattakarn (DPO)",
     notifTitle: "Notification Center",
-    notifSectionBroadcast: "สคส. Urgent Broadcast",
+    notifSectionBroadcast: "PDPC Urgent Broadcast",
     notifSectionGeneral: "System Notifications",
     notifMsg1: "Baseline proven log recorded continuously as safety proof.",
     notifMsg2: "DPO security credential verified on 2FA pipeline.",
@@ -84,10 +84,10 @@ const translations = {
     chartScore: "{value} Points",
 
     // NationalAlertFeed
-    alertTitle: "สคส. Urgent Broadcast",
+    alertTitle: "PDPC Urgent Broadcast",
     alertFeedTitle: "National Threat Intelligence Feed",
-    noAlerts: "No active threat warnings from สคส. at this time.",
-    alertDetail: "Distributed Botnet campaign attack detected using the same payload to exploit multiple organizations nationwide. สคส. recommends temporarily enabling Traffic Throttling.",
+    noAlerts: "No active threat warnings from PDPC at this time.",
+    alertDetail: "Distributed Botnet campaign attack detected using the same payload to exploit multiple organizations nationwide. PDPC recommends temporarily enabling Traffic Throttling.",
     guardEnabledMsg: "Recommended guard is enabled",
     enableGuardBtn: "Enable recommended guard",
 
@@ -123,7 +123,7 @@ const translations = {
     legalReasonPlaceholder: "— Choose pre-defined reason —",
     additionalNoteLabel: "Additional Notes (Required)",
     additionalNotePlaceholder: "Enter brief reasoning for legal records...",
-    bulkConfirmCheckbox: "I verified that all items meet the exemption criteria under สคส. Announcement Clause 9 Paragraph 2 and accept that this record is stored permanently as read-only.",
+    bulkConfirmCheckbox: "I verified that all items meet the exemption criteria under PDPC Announcement Clause 9 Paragraph 2 and accept that this record is stored permanently as read-only.",
     bulkConfirmSubmit: "Confirm Permanent Bulk Close",
 
     // PolicyCenter
@@ -159,9 +159,9 @@ const translations = {
 
     // 1.1 Countdown
     countdownTitle: "72-Hour Legal Countdown",
-    countdownLabel: "Time remaining to report this incident to สคส. as required by law",
+    countdownLabel: "Time remaining to report this incident to PDPC as required by law",
     countdownLegalBasis: "Section 37(4) · Personal Data Protection Act",
-    countdownGraceTitle: "Awaiting สคส. review of emergency extension (+24h)",
+    countdownGraceTitle: "Awaiting PDPC review of emergency extension (+24h)",
     countdownGraceSub: "Grace period request submitted — countdown paused pending decision",
 
     // 1.2 Blast Radius
@@ -209,7 +209,7 @@ const translations = {
     edgeExploit: "Exploit",
     edgeExfil: "Exfiltration",
     vectorAiSummary:
-      "Attack fingerprint (Metadata Pattern) matches the hacker group that สคส. broadcast a warning about two days ago.",
+      "Attack fingerprint (Metadata Pattern) matches the hacker group that PDPC broadcast a warning about two days ago.",
     vectorAiLabel: "AI Advisory (Internal Use Only)",
     btnRequestGrace: "Request Extension (Grace Period)",
     btnDraftReport: "Draft Official Report (Form DPO)",
@@ -217,7 +217,7 @@ const translations = {
 
     // 3.1 Grace Period
     graceTitle: "Emergency Grace Period Request",
-    graceSub: "CEO Emergency Grace Period Activator — request a reporting extension from สคส.",
+    graceSub: "CEO Emergency Grace Period Activator — request a reporting extension from PDPC.",
     graceReasonLabel: "Necessity reason (Required)",
     graceReasonPlaceholder: "— Select necessity reason —",
     graceReason1: "Core network was shut down for security — logs cannot be retrieved in time",
@@ -229,15 +229,15 @@ const translations = {
     graceSubmitBtn: "Approve & send emergency request",
     graceSentTitle: "Emergency request submitted",
     graceSentBody:
-      "Your grace period request has been sent to สคส. The countdown is paused pending their decision. Continue system recovery in the meantime.",
+      "Your grace period request has been sent to PDPC. The countdown is paused pending their decision. Continue system recovery in the meantime.",
     graceSentClose: "Close",
-    graceAlreadySent: "Request submitted — awaiting สคส. decision",
+    graceAlreadySent: "Request submitted — awaiting PDPC decision",
 
     // 3.2 Report draft
     reportTitle: "Automated Regulatory Report Draft",
     reportSub: "AI-Generated Initial Assessment (Internal Use Only) — not legal advice",
     reportDisclaimer:
-      "This draft is a data-extraction aid only. The DPO must review, edit the remediation fields, and confirm each step before submitting to สคส. One-click send is disabled by design.",
+      "This draft is a data-extraction aid only. The DPO must review, edit the remediation fields, and confirm each step before submitting to PDPC. One-click send is disabled by design.",
     reportFieldOrg: "Organization",
     reportFieldCategory: "Affected data category",
     reportFieldVolume: "Estimated record volume",
@@ -269,8 +269,8 @@ const translations = {
     // severity labels
     severityHighRisk: "High Risk",
     severityRiskPresent: "Risk Present",
-    severityHighRiskNote: "Must notify สคส. + data subjects",
-    severityRiskPresentNote: "Must notify สคส. only",
+    severityHighRiskNote: "Must notify PDPC + data subjects",
+    severityRiskPresentNote: "Must notify PDPC only",
 
     // status labels
     statusAwaitingReview: "Awaiting DPO review",
@@ -303,7 +303,7 @@ const translations = {
     timeline3c: "Bucket access revoked, export job disabled",
 
     crisisBackToList: "Back to incident queue",
-    aiSummary1: "Attack fingerprint (Metadata Pattern) matches the hacker group that สคส. broadcast a warning about two days ago.",
+    aiSummary1: "Attack fingerprint (Metadata Pattern) matches the hacker group that PDPC broadcast a warning about two days ago.",
     aiSummary2: "Request pattern is consistent with automated card-testing behaviour. No cross-tenant match found in the national campaign index.",
     aiSummary3: "No external attacker detected. Root cause is an internally-triggered batch job whose export scope was configured too broadly.",
     incidentNotFound: "Incident not found",
@@ -376,13 +376,13 @@ const translations = {
     timelineEscalated: "DPO rejected the exemption — case escalated for reporting",
     aiSummaryEscalated: "Escalated by DPO judgement rather than automated scoring. Pipeline B found no cross-tenant campaign match for this case.",
     actionRequiredTitle: "Action required — reportable incidents open",
-    actionRequiredOne: "1 case must be reported to สคส. within the legal timeframe",
-    actionRequiredMany: "{count} cases must be reported to สคส. within the legal timeframe",
+    actionRequiredOne: "1 case must be reported to PDPC within the legal timeframe",
+    actionRequiredMany: "{count} cases must be reported to PDPC within the legal timeframe",
     actionRequiredOpen: "Open case",
     actionRequiredRemaining: "time left",
-    actionRequiredNotifyBoth: "Notify สคส. + data subjects",
-    actionRequiredNotifyPdpc: "Notify สคส.",
-    actionRequiredGraceHeld: "Extension requested — awaiting สคส.",
+    actionRequiredNotifyBoth: "Notify PDPC + data subjects",
+    actionRequiredNotifyPdpc: "Notify PDPC",
+    actionRequiredGraceHeld: "Extension requested — awaiting PDPC",
     escalatedViewIncident: "View escalated incident",
     caseNewBadge: "NEW",
     caseNewAria: "New case — not yet opened by the DPO",
@@ -393,6 +393,8 @@ const translations = {
     countdownConfirmBtn: "Record time of awareness & start clock",
     countdownAwaitingShort: "Not started",
     countdownDetectedAtLabel: "System detected at",
+    countdownConfirmText: "Confirm",
+    countdownConfirmTextSub: "Start clock",
   },
   th: {
     // Topbar

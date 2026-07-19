@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { FULL_WINDOW_SECONDS } from "@/lib/AppStateContext";
 import { cn } from "@/lib/utils";
 
 /** นาฬิกานับถอยหลังขนาดเล็กสำหรับใช้ในแถวตาราง */
@@ -8,21 +9,37 @@ export function LiveCountdown({
   startSeconds,
   paused = false,
   notStarted = false,
+  deadlineAt = null,
   className,
 }: {
   startSeconds: number;
   paused?: boolean;
-  /** ยังไม่ได้บันทึกเวลาทราบเหตุ — แสดงจาง ๆ และไม่เดิน */
+  /** ยังไม่ได้บันทึกเวลาทราบเหตุ — แสดงกรอบเต็ม 72 ชม. แบบหยุดนิ่ง */
   notStarted?: boolean;
+  /** เวลาหมดเขตจริง (epoch ms) — ใช้แทนการนับเองเพื่อไม่ให้รีเซ็ตตอนสลับหน้า */
+  deadlineAt?: number | null;
   className?: string;
 }) {
-  const [remaining, setRemaining] = useState(startSeconds);
+  const [remaining, setRemaining] = useState(() =>
+    notStarted ? FULL_WINDOW_SECONDS : startSeconds,
+  );
 
   useEffect(() => {
-    if (paused || notStarted) return;
-    const id = setInterval(() => setRemaining((r) => Math.max(0, r - 1)), 1000);
+    if (notStarted) {
+      setRemaining(FULL_WINDOW_SECONDS);
+      return;
+    }
+    const tick = () =>
+      setRemaining(
+        deadlineAt !== null
+          ? Math.max(0, Math.floor((deadlineAt - Date.now()) / 1000))
+          : (r) => Math.max(0, r - 1),
+      );
+    if (deadlineAt !== null) tick();
+    if (paused) return;
+    const id = setInterval(tick, 1000);
     return () => clearInterval(id);
-  }, [paused, notStarted]);
+  }, [paused, notStarted, deadlineAt]);
 
   const pad = (n: number) => n.toString().padStart(2, "0");
   const h = Math.floor(remaining / 3600);

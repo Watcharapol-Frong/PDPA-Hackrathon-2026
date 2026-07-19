@@ -5,6 +5,7 @@ import { Clock, Hourglass, PlayCircle, Scale } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useTranslation } from "@/lib/LanguageContext";
+import { FULL_WINDOW_SECONDS } from "@/lib/AppStateContext";
 import { cn } from "@/lib/utils";
 
 interface CountdownTimerProps {
@@ -18,6 +19,8 @@ interface CountdownTimerProps {
   awarenessConfirmed?: boolean;
   onConfirmAwareness?: () => void;
   detectedAt?: string;
+  /** เวลาหมดเขตจริง (epoch ms) — มีค่าเมื่อกดยืนยันในเซสชันนี้ */
+  deadlineAt?: number | null;
 }
 
 export function CountdownTimer({
@@ -26,16 +29,31 @@ export function CountdownTimer({
   awarenessConfirmed = true,
   onConfirmAwareness,
   detectedAt,
+  deadlineAt = null,
 }: CountdownTimerProps) {
-  const [remaining, setRemaining] = useState(startSeconds);
+  // ยังไม่ยืนยัน = ยังไม่เสียเวลาไปเลย จึงโชว์กรอบเต็ม 72:00:00
+  const [remaining, setRemaining] = useState(() =>
+    awarenessConfirmed ? startSeconds : FULL_WINDOW_SECONDS,
+  );
   const { t } = useTranslation();
 
   useEffect(() => {
-    // หยุดนับทั้งตอนรอ สคส. และตอนที่ยังไม่ได้บันทึกเวลาทราบเหตุ
-    if (gracePending || !awarenessConfirmed) return;
-    const id = setInterval(() => setRemaining((r) => Math.max(0, r - 1)), 1000);
+    if (!awarenessConfirmed) {
+      setRemaining(FULL_WINDOW_SECONDS);
+      return;
+    }
+    const tick = () =>
+      setRemaining(
+        deadlineAt !== null
+          ? Math.max(0, Math.floor((deadlineAt - Date.now()) / 1000))
+          : (r) => Math.max(0, r - 1),
+      );
+    if (deadlineAt !== null) tick();
+    // หยุดนับตอนรอ สคส. พิจารณาขยายเวลา
+    if (gracePending) return;
+    const id = setInterval(tick, 1000);
     return () => clearInterval(id);
-  }, [gracePending, awarenessConfirmed]);
+  }, [gracePending, awarenessConfirmed, deadlineAt]);
 
   const pad = (n: number) => n.toString().padStart(2, "0");
   const h = Math.floor(remaining / 3600);

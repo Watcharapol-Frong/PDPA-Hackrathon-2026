@@ -58,6 +58,8 @@ interface AppStateValue {
    */
   isAwarenessConfirmed: (caseId: string) => boolean;
   confirmAwareness: (caseId: string) => void;
+  /** เวลาหมดเขตตามกฎหมาย (epoch ms) — null เมื่อยังไม่ได้บันทึกเวลาทราบเหตุ */
+  deadlineFor: (caseId: string) => number | null;
 
   /** เอกสารที่ยื่นแล้วของแต่ละเคส */
   documentsFor: (caseId: string) => IncidentDocuments;
@@ -85,6 +87,9 @@ const AppStateContext = createContext<AppStateValue | undefined>(undefined);
 function nowStamp() {
   return new Date().toISOString().slice(0, 19).replace("T", " ");
 }
+
+/** กรอบเวลาตามกฎหมาย 72 ชั่วโมง (ม.37(4)) */
+export const FULL_WINDOW_SECONDS = 72 * 3600;
 
 function formatId(n: number) {
   return `LOG-${String(n).padStart(4, "0")}`;
@@ -117,6 +122,12 @@ export function AppStateProvider({
   const [awarenessConfirmedIds, setAwarenessConfirmedIds] = useState<string[]>(() =>
     initialIncidents.filter((i) => i.status !== "awaiting_review").map((i) => i.caseId),
   );
+  /**
+   * เวลาหมดเขตของเคสที่กดยืนยันในเซสชันนี้ (epoch ms)
+   * เก็บเป็น deadline แทนตัวนับ เพื่อให้สลับหน้าแล้วเวลาไม่รีเซ็ต
+   * ไม่ตั้งค่าตั้งต้นด้วย Date.now() เพราะจะทำให้ค่า SSR กับ client ไม่ตรงกัน
+   */
+  const [deadlines, setDeadlines] = useState<Record<string, number>>({});
   const [policy, setPolicy] = useState<PolicyState>({
     dataMasking: true,
     trafficThrottling: false,
@@ -155,24 +166,26 @@ export function AppStateProvider({
     [awarenessConfirmedIds],
   );
 
-  /** บันทึกเวลาทราบเหตุ = เริ่มนับ 72 ชม. อย่างเป็นทางการ และสลักลง WORM Log */
+  const deadlineFor = useCallback(
+    (caseId: string) => deadlines[caseId] ?? null,
+    [deadlines],
+  );
+
+  /**
+   * บันทึกเวลาทราบเหตุ = เริ่มนับ 72 ชม. เต็มจากวินาทีนี้ (ไม่ใช่ต่อจากค่าที่ตั้งไว้)
+   * เพราะกฎหมายให้เวลาเต็มกรอบนับจากเวลาที่ทราบเหตุจริง
+   */
   const confirmAwareness = useCallback(
     (caseId: string) => {
-      let started = false;
-      setAwarenessConfirmedIds((ids) => {
-        if (ids.includes(caseId)) return ids;
-        started = true;
-        return [...ids, caseId];
+      if (awarenessConfirmedIds.includes(caseId)) return;
+      setAwarenessConfirmedIds((ids) => (ids.includes(caseId) ? ids : [...ids, caseId]));
+      setDeadlines((d) => ({ ...d, [caseId]: Date.now() + FULL_WINDOW_SECONDS * 1000 }));
+      appendLog({
+        actorKey: "auditActorDpo",
+        actionKey: "auditActionAwarenessConfirmed",
+        category: "dpo_action",
+        caseId,
       });
-      if (!awarenessConfirmedIds.includes(caseId)) {
-        appendLog({
-          actorKey: "auditActorDpo",
-          actionKey: "auditActionAwarenessConfirmed",
-          category: "dpo_action",
-          caseId,
-        });
-      }
-      return started;
     },
     [appendLog, awarenessConfirmedIds],
   );
@@ -377,6 +390,7 @@ export function AppStateProvider({
       markCaseViewed,
       isAwarenessConfirmed,
       confirmAwareness,
+      deadlineFor,
       documentsFor,
       canCloseCase,
       policy,
@@ -400,6 +414,7 @@ export function AppStateProvider({
       markCaseViewed,
       isAwarenessConfirmed,
       confirmAwareness,
+      deadlineFor,
       documentsFor,
       canCloseCase,
       policy,
