@@ -38,10 +38,8 @@ export function CountdownTimer({
   const { t } = useTranslation();
 
   useEffect(() => {
-    if (!awarenessConfirmed) {
-      setRemaining(FULL_WINDOW_SECONDS);
-      return;
-    }
+    // ยังไม่ยืนยัน = ไม่ตั้ง interval และไม่แตะ state (ค่าที่แสดงคำนวณตอน render)
+    if (!awarenessConfirmed) return;
     const tick = () =>
       setRemaining(
         deadlineAt !== null
@@ -55,10 +53,12 @@ export function CountdownTimer({
     return () => clearInterval(id);
   }, [gracePending, awarenessConfirmed, deadlineAt]);
 
+  // ยังไม่ยืนยัน = ยังไม่เสียเวลาไปเลย จึงโชว์กรอบเต็ม 72:00:00
+  const shown = awarenessConfirmed ? remaining : FULL_WINDOW_SECONDS;
   const pad = (n: number) => n.toString().padStart(2, "0");
-  const h = Math.floor(remaining / 3600);
-  const m = Math.floor((remaining % 3600) / 60);
-  const s = remaining % 60;
+  const h = Math.floor(shown / 3600);
+  const m = Math.floor((shown % 3600) / 60);
+  const s = shown % 60;
 
   if (!awarenessConfirmed) {
     return (

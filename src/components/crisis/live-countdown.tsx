@@ -25,10 +25,8 @@ export function LiveCountdown({
   );
 
   useEffect(() => {
-    if (notStarted) {
-      setRemaining(FULL_WINDOW_SECONDS);
-      return;
-    }
+    // ยังไม่เริ่มนับ = ไม่ต้องตั้ง interval และไม่ต้องแตะ state (ค่าที่แสดงคำนวณตอน render)
+    if (notStarted) return;
     const tick = () =>
       setRemaining(
         deadlineAt !== null
@@ -41,13 +39,15 @@ export function LiveCountdown({
     return () => clearInterval(id);
   }, [paused, notStarted, deadlineAt]);
 
+  // ค่าที่แสดง: ยังไม่เริ่มนับให้โชว์กรอบเต็มเสมอ
+  const shown = notStarted ? FULL_WINDOW_SECONDS : remaining;
   const pad = (n: number) => n.toString().padStart(2, "0");
-  const h = Math.floor(remaining / 3600);
-  const m = Math.floor((remaining % 3600) / 60);
-  const s = remaining % 60;
+  const h = Math.floor(shown / 3600);
+  const m = Math.floor((shown % 3600) / 60);
+  const s = shown % 60;
 
   // เหลือน้อยกว่า 12 ชม. ถือว่าวิกฤต
-  const critical = remaining < 12 * 3600;
+  const critical = shown < 12 * 3600;
 
   return (
     <span
