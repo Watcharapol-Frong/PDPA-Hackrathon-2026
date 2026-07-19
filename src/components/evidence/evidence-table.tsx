@@ -19,6 +19,7 @@ const categoryMeta: Record<AuditCategory, { labelKey: TranslationKey; className:
   dpo_action: { labelKey: "evidenceCatDpoAction", className: "bg-primary/10 text-primary" },
   policy: { labelKey: "evidenceCatPolicy", className: "bg-blue-100 text-blue-800" },
   report: { labelKey: "evidenceCatReport", className: "bg-muted text-muted-foreground" },
+  exemption: { labelKey: "evidenceCatExemption", className: "bg-brand-success/10 text-brand-success" },
 };
 
 export function EvidenceTable({ entries }: { entries: AuditEntry[] }) {
@@ -61,10 +62,13 @@ export function EvidenceTable({ entries }: { entries: AuditEntry[] }) {
                   {e.timestamp}
                 </TableCell>
                 <TableCell className="py-3 text-xs whitespace-nowrap">{t(e.actorKey)}</TableCell>
-                <TableCell className="py-3 text-xs font-semibold max-w-[260px]">
-                  {t(e.actionKey)}
+                <TableCell className="py-3 text-xs font-semibold">
+                  <div className="max-w-[260px] whitespace-normal break-words">
+                    {t(e.actionKey)}
+                  </div>
                 </TableCell>
-                <TableCell className="py-3 text-[11px] text-muted-foreground max-w-[280px]">
+                <TableCell className="py-3 text-[11px] text-muted-foreground">
+                  <div className="max-w-[280px] whitespace-normal break-words">
                   {e.rationaleKey ? t(e.rationaleKey) : null}
                   {e.rationaleText ? (
                     <span className={cn("block", e.rationaleKey && "mt-0.5 italic")}>
@@ -72,6 +76,7 @@ export function EvidenceTable({ entries }: { entries: AuditEntry[] }) {
                     </span>
                   ) : null}
                   {!e.rationaleKey && !e.rationaleText ? t("evidenceNoRationale") : null}
+                  </div>
                 </TableCell>
                 <TableCell className="py-3 whitespace-nowrap">
                   <span

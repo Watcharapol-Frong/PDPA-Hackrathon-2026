@@ -232,6 +232,33 @@ export const gracePeriodReasonKeys = [
 /** บันทึก WORM ตั้งต้น — เหตุการณ์ที่ระบบตรวจพบเองก่อน DPO จะเข้ามา */
 export const initialAuditLog: AuditEntry[] = [
   {
+    id: "LOG-0005",
+    timestamp: "2026-07-18 02:22:07",
+    actorKey: "auditActorSystem",
+    actionKey: "auditActionExemptionDetected",
+    rationaleText: "M=10.0 · email_address · 12 rows",
+    category: "detection",
+    caseId: "CASE-2026-0005",
+  },
+  {
+    id: "LOG-0004",
+    timestamp: "2026-07-18 02:21:15",
+    actorKey: "auditActorSystem",
+    actionKey: "auditActionExemptionDetected",
+    rationaleText: "M=5.0 · phone_number, address · 890 rows",
+    category: "detection",
+    caseId: "CASE-2026-0004",
+  },
+  {
+    id: "LOG-0003",
+    timestamp: "2026-07-18 02:20:52",
+    actorKey: "auditActorSystem",
+    actionKey: "auditActionExemptionDetected",
+    rationaleText: "M=10.0 · session_token, device_fingerprint · 320 rows",
+    category: "detection",
+    caseId: "CASE-2026-0003",
+  },
+  {
     id: "LOG-0002",
     timestamp: "2026-07-18 02:18:41",
     actorKey: "auditActorSystem",
