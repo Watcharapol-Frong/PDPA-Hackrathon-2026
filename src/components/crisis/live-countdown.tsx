@@ -7,19 +7,22 @@ import { cn } from "@/lib/utils";
 export function LiveCountdown({
   startSeconds,
   paused = false,
+  notStarted = false,
   className,
 }: {
   startSeconds: number;
   paused?: boolean;
+  /** ยังไม่ได้บันทึกเวลาทราบเหตุ — แสดงจาง ๆ และไม่เดิน */
+  notStarted?: boolean;
   className?: string;
 }) {
   const [remaining, setRemaining] = useState(startSeconds);
 
   useEffect(() => {
-    if (paused) return;
+    if (paused || notStarted) return;
     const id = setInterval(() => setRemaining((r) => Math.max(0, r - 1)), 1000);
     return () => clearInterval(id);
-  }, [paused]);
+  }, [paused, notStarted]);
 
   const pad = (n: number) => n.toString().padStart(2, "0");
   const h = Math.floor(remaining / 3600);
@@ -33,7 +36,11 @@ export function LiveCountdown({
     <span
       className={cn(
         "font-mono font-bold tabular-nums",
-        critical && !paused ? "text-destructive" : "text-foreground",
+        notStarted
+          ? "text-muted-foreground/50"
+          : critical && !paused
+            ? "text-destructive"
+            : "text-foreground",
         className,
       )}
     >

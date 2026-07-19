@@ -47,7 +47,7 @@ const statusMeta: Record<
 export function IncidentList({ incidents }: { incidents: IncidentData[] }) {
   const { t, language } = useTranslation();
   const router = useRouter();
-  const { isNewCase, markCaseViewed } = useAppState();
+  const { isNewCase, markCaseViewed, isAwarenessConfirmed } = useAppState();
 
   // Triage Logic ตาม spec — เคสที่เหลือเวลาน้อยที่สุดอยู่บนสุดเสมอ
   const sorted = [...incidents].sort((a, b) => a.remainingSeconds - b.remainingSeconds);
@@ -121,6 +121,7 @@ export function IncidentList({ incidents }: { incidents: IncidentData[] }) {
                   const href = `/crisis-room/${inc.caseId}`;
                   const isMostUrgent = i === 0;
                   const isNew = isNewCase(inc.caseId);
+                  const notStarted = !isAwarenessConfirmed(inc.caseId);
                   const open = () => {
                     markCaseViewed(inc.caseId);
                     router.push(href);
@@ -203,8 +204,14 @@ export function IncidentList({ incidents }: { incidents: IncidentData[] }) {
                         <LiveCountdown
                           startSeconds={inc.remainingSeconds}
                           paused={inc.status === "grace_requested"}
+                          notStarted={notStarted}
                           className="text-sm"
                         />
+                        {notStarted && (
+                          <div className="text-[9px] text-muted-foreground mt-0.5">
+                            {t("countdownAwaitingShort")}
+                          </div>
+                        )}
                         {inc.status === "grace_requested" && (
                           <div className="text-[9px] text-blue-700 font-semibold mt-0.5">+24h</div>
                         )}

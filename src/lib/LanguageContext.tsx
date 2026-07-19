@@ -387,6 +387,12 @@ const translations = {
     caseNewBadge: "NEW",
     caseNewAria: "New case — not yet opened by the DPO",
     caseNewCount: "{count} new",
+    auditActionAwarenessConfirmed: "Time of awareness recorded — 72-hour clock started",
+    countdownNotStarted: "Legal clock not started",
+    countdownNotStartedSub: "The 72-hour window runs from the time the DPO becomes aware, not from system detection. Review the incident, then record the time of awareness to start it.",
+    countdownConfirmBtn: "Record time of awareness & start clock",
+    countdownAwaitingShort: "Not started",
+    countdownDetectedAtLabel: "System detected at",
   },
   th: {
     // Topbar
@@ -763,6 +769,12 @@ const translations = {
     caseNewBadge: "ใหม่",
     caseNewAria: "เคสใหม่ — DPO ยังไม่เคยเปิดดู",
     caseNewCount: "ใหม่ {count}",
+    auditActionAwarenessConfirmed: "บันทึกเวลาที่ทราบเหตุ — เริ่มนับ 72 ชั่วโมง",
+    countdownNotStarted: "ยังไม่เริ่มนับกรอบเวลากฎหมาย",
+    countdownNotStartedSub: "กรอบ 72 ชั่วโมงเริ่มนับจากเวลาที่ DPO ทราบเหตุจริง ไม่ใช่เวลาที่ระบบตรวจพบ กรุณาตรวจสอบเหตุแล้วบันทึกเวลาที่ทราบเหตุเพื่อเริ่มนับ",
+    countdownConfirmBtn: "บันทึกเวลาที่ทราบเหตุ & เริ่มนับถอยหลัง",
+    countdownAwaitingShort: "ยังไม่เริ่มนับ",
+    countdownDetectedAtLabel: "ระบบตรวจพบเมื่อ",
   },
 };
 

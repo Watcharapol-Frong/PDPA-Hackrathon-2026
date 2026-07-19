@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
  * จะเห็นจากหน้าแรกว่ามีคดีค้างและเหลือเวลาเท่าไหร่
  */
 export function ActionRequiredBanner() {
-  const { incidents, isGracePending, isNewCase, markCaseViewed } = useAppState();
+  const { incidents, isGracePending, isNewCase, markCaseViewed, isAwarenessConfirmed } = useAppState();
   const { t } = useTranslation();
 
   if (incidents.length === 0) return null;
@@ -66,6 +66,7 @@ export function ActionRequiredBanner() {
           const high = inc.severity === "high_risk";
           const held = isGracePending(inc.caseId);
           const isNew = isNewCase(inc.caseId);
+          const notStarted = !isAwarenessConfirmed(inc.caseId);
           return (
             <li
               key={inc.caseId}
@@ -107,11 +108,16 @@ export function ActionRequiredBanner() {
               <div className="flex items-center gap-3 shrink-0">
                 <div className="text-right">
                   <div className="text-[9px] uppercase tracking-wider text-muted-foreground">
-                    {held ? t("actionRequiredGraceHeld") : t("actionRequiredRemaining")}
+                    {notStarted
+                      ? t("countdownAwaitingShort")
+                      : held
+                        ? t("actionRequiredGraceHeld")
+                        : t("actionRequiredRemaining")}
                   </div>
                   <LiveCountdown
                     startSeconds={inc.remainingSeconds}
                     paused={held}
+                    notStarted={notStarted}
                     className="text-sm"
                   />
                 </div>

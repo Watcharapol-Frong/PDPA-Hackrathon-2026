@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Fingerprint, Info, Radar, ShieldCheck } from "lucide-react";
+import { ArrowRight, Fingerprint, Info, Radar, ShieldCheck, Megaphone, ShieldAlert, Cpu } from "lucide-react";
 import { AppShell } from "@/components/layout/app-shell";
 import { AttackVectorGraph } from "@/components/crisis/attack-vector-graph";
 import { RiskTelemetryChart } from "@/components/dashboard/risk-telemetry-chart";
@@ -19,7 +19,7 @@ const ioaKeys: TranslationKey[] = [
 ];
 
 export default function ThreatAnalyticsPage() {
-  const { incident } = useAppState();
+  const { incident, policy } = useAppState();
   const { t, language } = useTranslation();
   const isEn = language === "en";
 
@@ -75,7 +75,7 @@ export default function ThreatAnalyticsPage() {
               </div>
             </div>
 
-            {/* Metrics Split Grid */}
+            {/* Content Split: Risk Telemetry & Sector Peer defense */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
               {/* Telemetry Chart */}
               <div className="lg:col-span-8 flex flex-col">
@@ -90,36 +90,93 @@ export default function ThreatAnalyticsPage() {
                 </div>
               </div>
 
-              {/* Indicators of Attack (IOA) */}
+              {/* Sector Peer Impact Status */}
               <div className="lg:col-span-4 flex flex-col">
-                <div className="border bg-card rounded-2xl p-4 flex-1 flex flex-col">
+                <div className="border bg-card rounded-2xl p-4 flex-1 flex flex-col justify-between">
                   <div className="border-b pb-2 mb-3">
-                    <span className="text-xs font-bold text-foreground">{t("threatIoaTitle")}</span>
-                    <p className="text-[10px] text-muted-foreground mt-0.5">{t("threatIoaSub")}</p>
+                    <span className="text-xs font-bold text-foreground">{isEn ? "Sector Peer Impact Status" : "ความเคลื่อนไหวในกลุ่มธุรกิจเดียวกัน"}</span>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">{isEn ? "Anonymized real-time peer telemetry" : "สถานะการรับมือขององค์กรพันธมิตรในกลุ่มการเงิน"}</p>
                   </div>
-                  <ul className="space-y-3 flex-1 flex flex-col justify-center">
-                    {ioaKeys.map((key) => (
-                      <li key={key} className="flex gap-2.5 items-start text-[11px] leading-relaxed text-muted-foreground hover:text-foreground transition-colors py-0.5">
-                        <span className="mt-1.5 size-1.5 rounded-full bg-red-500/80 shrink-0" />
-                        <span>{t(key)}</span>
-                      </li>
+                  
+                  <div className="space-y-2 flex-1 flex flex-col justify-center">
+                    {[
+                      { name: isEn ? "Fintech Provider A" : "ผู้ให้บริการฟินเทค A", status: "Mitigated", badge: "bg-emerald-500/10 text-emerald-700 border-emerald-500/20" },
+                      { name: isEn ? "Commercial Bank B" : "ธนาคารพาณิชย์ B", status: "Protected", badge: "bg-blue-500/10 text-blue-700 border-blue-500/20" },
+                      { name: isEn ? "Digital Wallet C" : "บริการกระเป๋าเงินดิจิทัล C", status: "Under Attack", badge: "bg-red-500/10 text-red-700 border-red-500/20" },
+                      { name: isEn ? "Brokerage Portal D" : "พอร์ทัลโบรกเกอร์ D", status: "Investigating", badge: "bg-amber-500/10 text-amber-700 border-amber-500/20" },
+                    ].map((peer, idx) => (
+                      <div key={idx} className="flex justify-between items-center py-1.5 border-b last:border-0 text-xs">
+                        <span className="text-muted-foreground font-semibold">{peer.name}</span>
+                        <span className={cn("text-[9px] font-bold px-2 py-0.5 rounded-full border", peer.badge)}>{peer.status}</span>
+                      </div>
                     ))}
-                  </ul>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Attack Vector Graph representation */}
-            <div className="bg-card border rounded-2xl p-4">
-              <div className="border-b pb-2 mb-3">
-                <span className="text-xs font-bold text-foreground">{isEn ? "API Exfiltration Vector" : "เส้นทางโจมตีและการดึงข้อมูล"}</span>
-                <p className="text-[10px] text-muted-foreground">{isEn ? "Visual mapping of suspicious entrypoints and databases" : "ผังแสดงจุดที่ผู้โจมตีเข้าถึงและการเชื่อมโยงข้อมูลภายใน"}</p>
+            {/* Split: Attack Vector & PDPC CERT Broadcast */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+              {/* Attack Vector Graph representation */}
+              <div className="lg:col-span-8 bg-card border rounded-2xl p-4 flex flex-col">
+                <div className="border-b pb-2 mb-3">
+                  <span className="text-xs font-bold text-foreground">{isEn ? "API Exfiltration Vector" : "เส้นทางโจมตีและการดึงข้อมูล"}</span>
+                  <p className="text-[10px] text-muted-foreground">{isEn ? "Visual mapping of suspicious entrypoints and databases" : "ผังแสดงจุดที่ผู้โจมตีเข้าถึงและการเชื่อมโยงข้อมูลภายใน"}</p>
+                </div>
+                <div className="flex-1">
+                  <AttackVectorGraph
+                    nodes={incident.nodes}
+                    edges={incident.edges}
+                    summaryKey={incident.aiSummaryKey}
+                  />
+                </div>
               </div>
-              <AttackVectorGraph
-                nodes={incident.nodes}
-                edges={incident.edges}
-                summaryKey={incident.aiSummaryKey}
-              />
+
+              {/* PDPC-CERT Official Feed & WAF active rules */}
+              <div className="lg:col-span-4 flex flex-col gap-6">
+                {/* Official Broadcast */}
+                <div className="border bg-card rounded-2xl p-4 space-y-3 flex-1">
+                  <div className="flex items-center gap-1.5 text-red-600 dark:text-red-500 border-b pb-2">
+                    <Megaphone className="size-4 animate-bounce" />
+                    <span className="text-xs font-bold uppercase tracking-wider">{isEn ? "PDPC-CERT Alert Feed" : "ประกาศเตือนภัยจาก สคส."}</span>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="bg-red-50/50 dark:bg-red-950/10 p-2.5 rounded-xl border border-red-200/50 text-[10px] leading-relaxed">
+                      <span className="font-bold text-red-800 dark:text-red-400 block mb-0.5">Alert ID: PDPC-IOC-2026-041</span>
+                      {isEn 
+                        ? "Warning: Multi-tenant API scraping campaign targeting financial databases. Attackers utilize cross-tenant parameters to access unmasked fields."
+                        : "คำเตือน: เฝ้าระวังแคมเปญสแกนช่องโหว่ API เจาะข้อมูลข้ามบัญชีลูกค้าในกลุ่มฟินเทค แนะนำควบคุมปริมาณทราฟฟิกขาเข้าด่วน"}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Gateway Rules Checklist */}
+                <div className="border bg-card rounded-2xl p-4 space-y-3 flex-1">
+                  <div className="flex items-center gap-1.5 text-foreground border-b pb-2">
+                    <Cpu className="size-4 text-primary" />
+                    <span className="text-xs font-bold">{isEn ? "Active Countermeasures" : "ความพร้อมนโยบายเกราะป้องกัน"}</span>
+                  </div>
+                  <div className="space-y-2 text-[11px]">
+                    {[
+                      { name: isEn ? "Data Masking (PII Shield)" : "ระบบซ่อนฟิลด์สิทธิการจำยอม (Masking)", active: policy.dataMasking },
+                      { name: isEn ? "API Rate Limiting (Throttling)" : "ระบบควบคุมความเร็วการดึงข้อมูล (Throttling)", active: policy.trafficThrottling },
+                      { name: isEn ? "WORM Lock (Immutable Ledger)" : "บันทึกความสมบูรณ์ไฟล์ถาวร (WORM Ledger)", active: true },
+                    ].map((rule, idx) => (
+                      <div key={idx} className="flex justify-between items-center py-1">
+                        <span className="text-muted-foreground">{rule.name}</span>
+                        <span className={cn(
+                          "text-[9px] font-bold px-1.5 py-0.2 rounded-md font-mono border",
+                          rule.active 
+                            ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" 
+                            : "bg-zinc-500/10 text-zinc-500 border-zinc-500/20"
+                        )}>
+                          {rule.active ? "ACTIVE" : "INACTIVE"}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Privacy Information Panel */}

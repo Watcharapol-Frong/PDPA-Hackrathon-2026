@@ -17,7 +17,7 @@ import { useAppState } from "@/lib/AppStateContext";
 export default function IncidentDetailPage() {
   const params = useParams<{ caseId: string }>();
   // Action Flow B — สถานะขอขยายเวลาอยู่ใน store กลาง หน้าอื่นจึงเห็นผลทันที
-  const { getIncident, isGracePending } = useAppState();
+  const { getIncident, isGracePending, isAwarenessConfirmed, confirmAwareness } = useAppState();
   const caseId = decodeURIComponent(params.caseId);
   const incident = getIncident(caseId);
   const gracePending = isGracePending(caseId);
@@ -74,6 +74,9 @@ export default function IncidentDetailPage() {
             <CountdownTimer
               startSeconds={incident.remainingSeconds}
               gracePending={gracePending}
+              awarenessConfirmed={isAwarenessConfirmed(caseId)}
+              onConfirmAwareness={() => confirmAwareness(caseId)}
+              detectedAt={incident.detectedAt}
             />
           </div>
           <div className="lg:col-span-8">

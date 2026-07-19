@@ -52,6 +52,13 @@ interface AppStateValue {
   newCaseCount: number;
   markCaseViewed: (caseId: string) => void;
 
+  /**
+   * นาฬิกา 72 ชม. เริ่มนับจาก Time of Awareness (เวลาที่ DPO ทราบเหตุจริง)
+   * ไม่ใช่ Alert Timestamp ที่ระบบตรวจพบ — Technical Spec ข้อ 6
+   */
+  isAwarenessConfirmed: (caseId: string) => boolean;
+  confirmAwareness: (caseId: string) => void;
+
   /** เอกสารที่ยื่นแล้วของแต่ละเคส */
   documentsFor: (caseId: string) => IncidentDocuments;
   /** State 3 ต้องครบทั้ง 2 ฉบับ / State 2 ต้องมีรายงาน สคส. */
@@ -106,6 +113,10 @@ export function AppStateProvider({
   const [viewedCaseIds, setViewedCaseIds] = useState<string[]>(() =>
     initialIncidents.filter((i) => i.status !== "awaiting_review").map((i) => i.caseId),
   );
+  // เคสที่ DPO บันทึกเวลาทราบเหตุแล้วเท่านั้นที่นาฬิกาเดิน
+  const [awarenessConfirmedIds, setAwarenessConfirmedIds] = useState<string[]>(() =>
+    initialIncidents.filter((i) => i.status !== "awaiting_review").map((i) => i.caseId),
+  );
   const [policy, setPolicy] = useState<PolicyState>({
     dataMasking: true,
     trafficThrottling: false,
@@ -137,6 +148,33 @@ export function AppStateProvider({
   const isNewCase = useCallback(
     (caseId: string) => !viewedCaseIds.includes(caseId),
     [viewedCaseIds],
+  );
+
+  const isAwarenessConfirmed = useCallback(
+    (caseId: string) => awarenessConfirmedIds.includes(caseId),
+    [awarenessConfirmedIds],
+  );
+
+  /** บันทึกเวลาทราบเหตุ = เริ่มนับ 72 ชม. อย่างเป็นทางการ และสลักลง WORM Log */
+  const confirmAwareness = useCallback(
+    (caseId: string) => {
+      let started = false;
+      setAwarenessConfirmedIds((ids) => {
+        if (ids.includes(caseId)) return ids;
+        started = true;
+        return [...ids, caseId];
+      });
+      if (!awarenessConfirmedIds.includes(caseId)) {
+        appendLog({
+          actorKey: "auditActorDpo",
+          actionKey: "auditActionAwarenessConfirmed",
+          category: "dpo_action",
+          caseId,
+        });
+      }
+      return started;
+    },
+    [appendLog, awarenessConfirmedIds],
   );
 
   const markCaseViewed = useCallback((caseId: string) => {
@@ -337,6 +375,8 @@ export function AppStateProvider({
       isNewCase,
       newCaseCount,
       markCaseViewed,
+      isAwarenessConfirmed,
+      confirmAwareness,
       documentsFor,
       canCloseCase,
       policy,
@@ -358,6 +398,8 @@ export function AppStateProvider({
       isNewCase,
       newCaseCount,
       markCaseViewed,
+      isAwarenessConfirmed,
+      confirmAwareness,
       documentsFor,
       canCloseCase,
       policy,
