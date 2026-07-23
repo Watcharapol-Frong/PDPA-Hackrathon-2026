@@ -3,6 +3,7 @@
 import { use, useMemo, type ReactNode } from "react";
 import { AppStateProvider } from "../AppStateContext";
 import { getDataSource } from "./index";
+import { mockDataSource } from "./mockDataSource";
 
 interface AppDataProviderProps {
   children: ReactNode;
@@ -15,7 +16,18 @@ interface AppDataProviderProps {
  */
 export function AppDataProvider({ children }: AppDataProviderProps) {
   const dataSource = useMemo(() => getDataSource(), []);
-  const seed = use(useMemo(() => dataSource.load(), [dataSource]));
+  // ถ้า Supabase ตั้งค่าไว้แต่ query ล้มเหลว (เช่นยังไม่รัน schema.sql) ให้ตกกลับไป mock
+  // แทนที่จะพังทั้งแอป — เห็น error ใน console แต่ demo ยังใช้งานต่อได้
+  const seed = use(
+    useMemo(
+      () =>
+        dataSource.load().catch((err) => {
+          console.error("[AppDataProvider] โหลดข้อมูลจาก data source ล้มเหลว ใช้ mock แทน:", err);
+          return mockDataSource.load();
+        }),
+      [dataSource],
+    ),
+  );
 
   return (
     <AppStateProvider
