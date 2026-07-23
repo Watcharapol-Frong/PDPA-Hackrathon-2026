@@ -8,6 +8,10 @@
 -- graph nodes/edges, score factors) are stored as JSONB since the UI reads
 -- them as opaque structures keyed by TranslationKey — no relational value
 -- in normalizing them further for this app's scale.
+--
+-- After this file, optionally run supabase/seed.sql to populate the same
+-- demo cases the mock data source uses (src/lib/mockData.ts), so a
+-- Supabase-backed demo shows identical data to the mock one.
 
 create table if not exists incidents (
   case_id             text primary key,
