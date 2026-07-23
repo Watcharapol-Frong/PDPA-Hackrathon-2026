@@ -27,9 +27,9 @@ export const metadata: Metadata = {
     "Live Compliance Dashboard for connected organizations — PDPA Guardian B2B platform mockup",
 };
 
+import { Suspense } from "react";
 import { LanguageProvider } from "@/lib/LanguageContext";
-import { AppStateProvider } from "@/lib/AppStateContext";
-import { incidents, exemptionQueue, initialAuditLog } from "@/lib/mockData";
+import { AppDataProvider } from "@/lib/data/AppDataProvider";
 
 export default function RootLayout({
   children,
@@ -48,13 +48,9 @@ export default function RootLayout({
     >
       <body className="min-h-full font-sans">
         <LanguageProvider>
-          <AppStateProvider
-            initialIncidents={incidents}
-            initialExemptions={exemptionQueue}
-            initialAuditLog={initialAuditLog}
-          >
-            {children}
-          </AppStateProvider>
+          <Suspense fallback={null}>
+            <AppDataProvider>{children}</AppDataProvider>
+          </Suspense>
         </LanguageProvider>
       </body>
     </html>
