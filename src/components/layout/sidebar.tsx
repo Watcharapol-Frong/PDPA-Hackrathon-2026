@@ -15,11 +15,11 @@ export function Sidebar({ isOpen }: { isOpen: boolean }) {
         <div className={cn("h-16 flex items-center border-b shrink-0", isOpen ? "px-5" : "justify-center")}>
           {isOpen ? (
             <span className="font-mono text-xs tracking-wider text-muted-foreground uppercase font-bold">
-              PDPA Guardian
+              ทันการณ์ · ThanKan
             </span>
           ) : (
             <span className="font-mono text-xs tracking-wider text-muted-foreground uppercase font-bold">
-              PG
+              TK
             </span>
           )}
         </div>

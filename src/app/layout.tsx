@@ -22,9 +22,9 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "PDPA Guardian — Organization Portal",
+  title: "ทันการณ์ (ThanKan) — Organization Portal",
   description:
-    "Live Compliance Dashboard for connected organizations — PDPA Guardian B2B platform mockup",
+    "Live Compliance Dashboard for connected organizations — ทันการณ์ (ThanKan) B2B platform mockup",
 };
 
 import { Suspense } from "react";

@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  /* Brand accent tokens (PDPA Guardian) — used alongside shadcn semantic tokens */
+  /* Brand accent tokens (ทันการณ์ / ThanKan) — used alongside shadcn semantic tokens */
   --color-brand-primary: #ff5c00;
   --color-brand-success: #059669;
   --color-brand-warning: #d97706;
@@ -60,7 +60,7 @@
 }
 
 :root {
-  /* PDPA Guardian light theme mapped onto shadcn semantic tokens */
+  /* ทันการณ์ / ThanKan light theme mapped onto shadcn semantic tokens */
   --background: #f8fafc;
   --foreground: #0f172a;
   --card: #ffffff;

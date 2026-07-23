@@ -14,7 +14,7 @@ interface LanguageContextProps {
 const translations = {
   en: {
     // Topbar
-    appTitle: "PDPA Guardian",
+    appTitle: "ThanKan",
     companyName: "Siam Commerce Co., Ltd.",
     gatewayType: "SME-0001 · Centralized Shared Gateway",
     lastUpdated: "Last updated: 1 minute ago",
@@ -405,7 +405,7 @@ const translations = {
   },
   th: {
     // Topbar
-    appTitle: "PDPA Guardian",
+    appTitle: "ทันการณ์",
     companyName: "บริษัท สยามคอมเมิร์ซ จำกัด",
     gatewayType: "SME-0001 · Centralized Shared Gateway",
     lastUpdated: "อัปเดตล่าสุด: เมื่อ 1 นาทีที่แล้ว",
