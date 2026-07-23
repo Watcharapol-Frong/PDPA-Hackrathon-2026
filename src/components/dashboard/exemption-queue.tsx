@@ -46,6 +46,23 @@ interface ExemptionQueueProps {
   onReject?: (ids: string[]) => void;
 }
 
+/**
+ * ประกาศไว้นอก component เพราะถ้าอยู่ข้างในจะถูกสร้างใหม่ทุก render
+ * ทำให้ React มองเป็นคนละ component แล้ว remount ทิ้ง state ทุกครั้ง
+ */
+function ScoreTable({ c }: { c: ExemptionCase }) {
+  return (
+    <div className="border rounded-xl divide-y overflow-hidden">
+      {c.scoreFactors.map((f) => (
+        <div key={f.label} className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-4 py-2 gap-1 text-xs">
+          <span className="text-muted-foreground">{f.label}</span>
+          <span className="font-semibold sm:text-right">{f.value}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 type FilterRisk = "ALL_RISK" | "High" | "Medium" | "Low";
 
 export function ExemptionQueue({ queue, onApprove, onReject }: ExemptionQueueProps) {
@@ -166,17 +183,6 @@ export function ExemptionQueue({ queue, onApprove, onReject }: ExemptionQueuePro
         );
     }
   };
-
-  const ScoreTable = ({ c }: { c: ExemptionCase }) => (
-    <div className="border rounded-xl divide-y overflow-hidden">
-      {c.scoreFactors.map((f) => (
-        <div key={f.label} className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-4 py-2 gap-1 text-xs">
-          <span className="text-muted-foreground">{f.label}</span>
-          <span className="font-semibold sm:text-right">{f.value}</span>
-        </div>
-      ))}
-    </div>
-  );
 
   return (
     <Card className="h-full flex flex-col" size="sm">
@@ -386,6 +392,16 @@ export function ExemptionQueue({ queue, onApprove, onReject }: ExemptionQueuePro
                   <p className="text-[10px] text-center text-muted-foreground">
                     {isEn ? "Approving records Form 5 exemption. Rejecting escalates as a 72-hour breach notification obligation." : "การอนุมัติบันทึก Form 5 · การปฏิเสธเพิ่มภาระแจ้ง สคส. ภายใน 72 ชม."}
                   </p>
+
+                  {/* ทางไปดูหลักฐานที่ถูกสลักไว้ของเคสนี้ (WORM) */}
+                  <div className="text-center">
+                    <Button asChild variant="link" size="sm" className="text-[10px] h-auto p-0">
+                      <Link href={`/audit-log?case=${encodeURIComponent(detailCase.id)}`}>
+                        {t("evidenceViewForCase")}
+                        <ArrowRight className="size-3" />
+                      </Link>
+                    </Button>
+                  </div>
                 </div>
 
                 {/* Right side: Draft Form 5 Document Preview */}

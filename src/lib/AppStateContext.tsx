@@ -22,7 +22,13 @@ import type { DataSinks } from "./data/DataSource";
 /** สถานะทางกฎหมายรวมขององค์กร ณ ขณะนั้น (Legal Risk State ตาม Spec 4) */
 export type LegalState = "1a" | "1b" | "2" | "3";
 
-export type AuditCategory = "detection" | "enforcement" | "dpo_action" | "policy" | "report";
+export type AuditCategory =
+  | "detection"
+  | "enforcement"
+  | "dpo_action"
+  | "policy"
+  | "report"
+  | "exemption";
 
 export interface AuditEntry {
   id: string;
@@ -272,18 +278,21 @@ export function AppStateProvider({
       setExemptionQueue((q) =>
         q.map((c) => (ids.includes(c.id) ? { ...c, status: "Approved" as const } : c)),
       );
-      ids.forEach((id) =>
+      ids.forEach((id) => {
+        const c = exemptionQueue.find((x) => x.id === id);
         appendLog({
           actorKey: "auditActorDpo",
           actionKey: "auditActionExemptionApproved",
-          rationaleText: note,
-          category: "dpo_action",
+          // Legal Rationale ต้องถูกสลักไว้เสมอ ไม่ใช่แค่ข้อความที่ DPO พิมพ์ (Technical Spec ข้อ 4)
+          rationaleKey: "auditRationaleMitigated",
+          rationaleText: c ? `${note} · M=${c.mitigationFactor.toFixed(1)}` : note,
+          category: "exemption",
           caseId: id,
-        }),
-      );
+        });
+      });
       sinksRef.current?.onApproveExemptions?.(ids, note);
     },
-    [appendLog],
+    [appendLog, exemptionQueue],
   );
 
   /**
