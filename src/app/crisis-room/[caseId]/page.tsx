@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { AlertCircle, ArrowLeft, Siren, Clock, FileText } from "lucide-react";
+import { AlertCircle, ArrowLeft, Siren, Clock, FileText, Users } from "lucide-react";
 import { AppShell } from "@/components/layout/app-shell";
 import { CountdownTimer } from "@/components/crisis/countdown-timer";
 import { BlastRadius } from "@/components/crisis/blast-radius";
@@ -17,7 +17,7 @@ import { useAppState } from "@/lib/AppStateContext";
 export default function IncidentDetailPage() {
   const params = useParams<{ caseId: string }>();
   // Action Flow B — สถานะขอขยายเวลาอยู่ใน store กลาง หน้าอื่นจึงเห็นผลทันที
-  const { getIncident, isGracePending, isAwarenessConfirmed, confirmAwareness, deadlineFor } =
+  const { getIncident, isGracePending, isAwarenessConfirmed, confirmAwareness, deadlineFor, documentsFor } =
     useAppState();
   const caseId = decodeURIComponent(params.caseId);
   const incident = getIncident(caseId);
@@ -127,6 +127,21 @@ export default function IncidentDetailPage() {
               <span>{t("btnDraftReport")}</span>
             </Link>
           </Button>
+          {/* State 3 (high_risk) ต้องแจ้งทั้ง สคส. และเจ้าของข้อมูล — ปุ่มนี้ขึ้นเฉพาะเคสระดับนี้ */}
+          {incident.severity === "high_risk" && (
+            <Button
+              asChild
+              variant="outline"
+              className="w-full sm:w-auto h-9 px-4 text-xs font-bold rounded-xl cursor-pointer flex items-center gap-1.5 border-red-200 text-red-700 hover:bg-red-50 dark:border-red-900 dark:text-red-400 dark:hover:bg-red-950/30"
+            >
+              <Link href={`/crisis-room/${encodeURIComponent(incident.caseId)}/notice-workspace`}>
+                <Users className="size-3.5" />
+                <span>
+                  {documentsFor(incident.caseId).dataSubjectNotice ? t("noticeAlreadySent") : t("btnFileNotice")}
+                </span>
+              </Link>
+            </Button>
+          )}
         </div>
       </main>
     </AppShell>
