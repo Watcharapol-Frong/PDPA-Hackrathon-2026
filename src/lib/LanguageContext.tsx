@@ -213,6 +213,8 @@ const translations = {
     vectorAiLabel: "AI Advisory (Internal Use Only)",
     btnRequestGrace: "Request Extension (Grace Period)",
     btnDraftReport: "Draft Official Report (Form DPO)",
+    btnFileNotice: "Notify Affected Individuals (Form 2)",
+    noticeAlreadySent: "Notice already sent to affected individuals",
     blastHeaderTitle: "Incident Scope & Impact Summary",
 
     // 3.1 Grace Period
@@ -602,6 +604,8 @@ const translations = {
     vectorAiLabel: "AI Advisory (Internal Use Only)",
     btnRequestGrace: "ยื่นคำร้องขอขยายเวลารายงาน (Grace Period)",
     btnDraftReport: "จัดทำร่างรายงานยื่น สคส. (Draft Report)",
+    btnFileNotice: "แจ้งเตือนประชาชนที่ได้รับผลกระทบ (Form 2)",
+    noticeAlreadySent: "แจ้งเตือนประชาชนที่ได้รับผลกระทบแล้ว",
     blastHeaderTitle: "ขอบเขตผลกระทบและสรุปข้อมูลคดี",
 
     // 3.1 Grace Period

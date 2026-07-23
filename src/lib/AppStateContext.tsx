@@ -4,6 +4,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -16,6 +17,7 @@ import type {
   PolicyState,
 } from "./types";
 import type { TranslationKey } from "./LanguageContext";
+import type { DataSinks } from "./data/DataSource";
 
 /** สถานะทางกฎหมายรวมขององค์กร ณ ขณะนั้น (Legal Risk State ตาม Spec 4) */
 export type LegalState = "1a" | "1b" | "2" | "3";
@@ -103,10 +105,16 @@ function formatId(n: number) {
 
 interface AppStateProviderProps {
   children: ReactNode;
-  /** เหตุวิกฤตตั้งต้น (mock) */
+  /** เหตุวิกฤตตั้งต้น (จาก DataSource ที่เลือกไว้ — mock หรือ supabase) */
   initialIncidents: IncidentData[];
   initialExemptions?: ExemptionCase[];
   initialAuditLog?: AuditEntry[];
+  /**
+   * Hook เขียนกลับไปยัง backend จริง (เช่น Supabase) — optional, เรียกแบบ
+   * fire-and-forget หลัง local state อัปเดตแล้ว mock adapter ไม่ส่งค่านี้มา
+   * จึงไม่มีผลต่อพฤติกรรมปัจจุบัน (เปิดช่องไว้สำหรับเฟสต่อไป)
+   */
+  sinks?: DataSinks;
 }
 
 export function AppStateProvider({
@@ -114,7 +122,12 @@ export function AppStateProvider({
   initialIncidents,
   initialExemptions = [],
   initialAuditLog = [],
+  sinks,
 }: AppStateProviderProps) {
+  const sinksRef = useRef(sinks);
+  useEffect(() => {
+    sinksRef.current = sinks;
+  }, [sinks]);
   const [incidents, setIncidents] = useState<IncidentData[]>(initialIncidents);
   const [gracePendingIds, setGracePendingIds] = useState<string[]>(() =>
     initialIncidents.filter((i) => i.status === "grace_requested").map((i) => i.caseId),
@@ -192,6 +205,7 @@ export function AppStateProvider({
         category: "dpo_action",
         caseId,
       });
+      sinksRef.current?.onConfirmAwareness?.(caseId);
     },
     [appendLog, awarenessConfirmedIds],
   );
@@ -230,6 +244,7 @@ export function AppStateProvider({
         category: "dpo_action",
         caseId,
       });
+      sinksRef.current?.onRequestGracePeriod?.(caseId, note);
     },
     [appendLog],
   );
@@ -253,6 +268,7 @@ export function AppStateProvider({
         });
       });
       setPolicy(next);
+      sinksRef.current?.onUpdatePolicy?.(next);
     },
     [appendLog, policy],
   );
@@ -274,6 +290,7 @@ export function AppStateProvider({
           caseId: id,
         });
       });
+      sinksRef.current?.onApproveExemptions?.(ids, note);
     },
     [appendLog, exemptionQueue],
   );
@@ -333,6 +350,7 @@ export function AppStateProvider({
         category: "dpo_action",
         caseId: id,
       });
+      sinksRef.current?.onEscalateExemption?.(id, escalated, note);
       return newCaseId;
     },
     [appendLog, exemptionQueue],
@@ -350,6 +368,7 @@ export function AppStateProvider({
         category: "report",
         caseId,
       });
+      sinksRef.current?.onFileDocument?.(caseId, doc);
     },
     [appendLog],
   );
@@ -364,6 +383,7 @@ export function AppStateProvider({
       });
       setIncidents((list) => list.filter((i) => i.caseId !== caseId));
       setGracePendingIds((ids) => ids.filter((i) => i !== caseId));
+      sinksRef.current?.onResolveIncident?.(caseId);
     },
     [appendLog],
   );
